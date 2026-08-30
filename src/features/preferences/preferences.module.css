@@ -1,0 +1,180 @@
+.launcher {
+  position: fixed;
+  z-index: 120;
+  inset-block-start: max(1rem, env(safe-area-inset-top));
+  inset-inline-end: max(1rem, var(--safe-inline-end));
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.16));
+  border-radius: 999px;
+  color: var(--text-primary, #fff);
+  background: var(--surface-translucent, rgba(12, 18, 16, 0.72));
+  box-shadow: var(--shadow-soft, 0 12px 36px rgba(0, 0, 0, 0.18));
+  backdrop-filter: blur(18px) saturate(1.12);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.launcher svg,
+.close svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+
+@media (max-width: 639px) {
+  .launcher span { display: none; }
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 180;
+  inset: 0;
+  border: 0;
+  background: var(--overlay, rgba(2, 8, 6, 0.64));
+  backdrop-filter: blur(5px);
+}
+
+.sheet {
+  position: fixed;
+  z-index: 181;
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: min(26rem, 100%);
+  overflow: auto;
+  padding: max(1.4rem, env(safe-area-inset-top)) max(1.25rem, env(safe-area-inset-right)) max(1.5rem, env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
+  color: var(--text-primary, #fff);
+  background: var(--surface-elevated, #121917);
+  border-inline-start: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  box-shadow: var(--shadow-elevated, 0 30px 90px rgba(0, 0, 0, 0.32));
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block-end: 1.25rem;
+  border-block-end: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+}
+
+.header h2 {
+  margin-top: 0.3rem;
+  font-size: clamp(1.75rem, 6vw, 2.35rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+[dir="rtl"] .header h2 { letter-spacing: 0; }
+
+.eyebrow {
+  color: var(--accent, #efd88f);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.close {
+  display: grid;
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 999px;
+  color: inherit;
+  background: var(--surface-translucent, rgba(255, 255, 255, 0.06));
+}
+
+.group {
+  display: grid;
+  gap: 1rem;
+  padding-block: 1.35rem;
+  border-block-end: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+}
+
+.group h3 {
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.group p,
+.note {
+  margin-top: 0.3rem;
+  color: var(--text-secondary, #b9c0bc);
+  font-size: 0.83rem;
+  line-height: 1.6;
+}
+
+.segmented,
+.appearanceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.appearanceGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.segmented button,
+.appearanceGrid button {
+  min-height: 3rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: var(--radius-control, 0.85rem);
+  color: var(--text-secondary, #d5dad7);
+  background: var(--surface, rgba(255, 255, 255, 0.045));
+  font-size: 0.83rem;
+  font-weight: 700;
+}
+
+.appearanceGrid button {
+  display: grid;
+  min-height: 4.8rem;
+  place-items: center;
+  gap: 0.38rem;
+  padding: 0.65rem 0.3rem;
+}
+
+.segmented button[aria-pressed="true"],
+.appearanceGrid button[aria-pressed="true"] {
+  border-color: var(--accent, #efd88f);
+  color: var(--text-primary, #fff);
+  background: var(--accent-muted, rgba(239, 216, 143, 0.12));
+}
+
+.appearanceGrid [data-swatch] {
+  display: block;
+  width: 2.1rem;
+  height: 1.35rem;
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.24));
+  border-radius: 0.4rem;
+  background: linear-gradient(135deg, #f2ecdf 50%, #111916 50%);
+}
+
+.appearanceGrid [data-swatch="light"] { background: #f2ecdf; }
+.appearanceGrid [data-swatch="dark"] { background: #111916; }
+
+.warning,
+.note {
+  margin-top: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-control, 0.85rem);
+  background: var(--warning-muted, rgba(222, 171, 84, 0.12));
+}
+
+.warning {
+  color: var(--warning, #f0c879);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 700px) {
+  .sheet { padding-inline: 1.65rem; }
+}

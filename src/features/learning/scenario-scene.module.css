@@ -1,0 +1,1339 @@
+.experience {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+  background: #07100d;
+}
+
+.stage {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.sceneCanvas {
+  --scene-gold: 245 205 127;
+  --scene-mint: 100 180 148;
+  --scene-bg-position: 50% 50%;
+  --character-inline: 50%;
+  --character-block: -2%;
+  --character-width: min(99vw, 31rem);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: #07100d;
+  perspective: 1000px;
+}
+
+.backgroundLayer,
+.midgroundLayer,
+.characterLayer,
+.foregroundLayer,
+.ambientLayer,
+.sceneVignette,
+.uiLayer,
+.guideLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.backgroundLayer {
+  z-index: 0;
+  inset: -0.5rem;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: -2.5%;
+}
+
+.backgroundImage img {
+  object-fit: cover;
+  object-position: var(--scene-bg-position);
+  filter: saturate(0.88) contrast(1.03) brightness(0.82);
+}
+
+.midgroundLayer {
+  z-index: 10;
+  inset: -0.4rem;
+  pointer-events: none;
+}
+
+.midgroundLayer > span,
+.foregroundLayer > span {
+  position: absolute;
+  display: block;
+}
+
+.characterLayer {
+  z-index: 20;
+  pointer-events: none;
+}
+
+.characterFigure {
+  position: absolute;
+  inset-block-start: auto;
+  inset-block-end: var(--character-block);
+  left: var(--character-inline);
+  width: var(--character-width);
+  height: 88%;
+  transform-origin: 50% 100%;
+  translate: -50% 0;
+  filter: saturate(0.88) contrast(1.01) drop-shadow(0 1.5rem 2rem rgb(0 0 0 / 35%));
+  animation: character-enter 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.characterPose {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  transform-origin: 50% 100%;
+}
+
+.characterFigure::after {
+  position: absolute;
+  left: 50%;
+  inset-block-end: 1.5%;
+  width: 58%;
+  height: 7%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(0 0 0 / 52%), transparent 72%);
+  content: "";
+  filter: blur(7px);
+  translate: -50% 0;
+}
+
+.characterPose img {
+  object-fit: contain;
+  object-position: 50% 100%;
+}
+
+.foregroundLayer {
+  z-index: 30;
+  inset: -0.65rem;
+  pointer-events: none;
+}
+
+.ambientLayer {
+  z-index: 40;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.ambientLayer > span {
+  position: absolute;
+  display: block;
+  border-radius: 999px;
+  opacity: 0.22;
+  filter: blur(18px);
+}
+
+.ambientLayer > span:first-child {
+  inset-block-start: 8%;
+  left: -12%;
+  width: 52%;
+  height: 16%;
+  background: linear-gradient(90deg, transparent, rgb(var(--scene-gold) / 42%), transparent);
+  animation: light-pass 12s ease-in-out infinite alternate;
+}
+
+.ambientLayer > span:nth-child(2) {
+  inset-block-start: 18%;
+  right: 9%;
+  width: 0.38rem;
+  height: 0.38rem;
+  background: rgb(var(--scene-gold));
+  box-shadow:
+    -4rem 6rem 0 rgb(var(--scene-gold) / 50%),
+    2rem 12rem 0 rgb(var(--scene-gold) / 38%),
+    -8rem 18rem 0 rgb(var(--scene-gold) / 35%);
+  animation: ambient-drift 8s ease-in-out infinite alternate;
+}
+
+.ambientLayer > span:nth-child(3) {
+  inset-block-end: 9%;
+  right: -7%;
+  width: 42%;
+  height: 10%;
+  background: rgb(var(--scene-mint) / 20%);
+  animation: ambient-drift 10s ease-in-out 1s infinite alternate-reverse;
+}
+
+.sceneVignette {
+  z-index: 45;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(3 7 6 / 30%) 0%, transparent 22%, transparent 52%, rgb(3 6 5 / 78%) 100%),
+    linear-gradient(90deg, rgb(3 7 6 / 26%), transparent 20%, transparent 82%, rgb(3 7 6 / 22%));
+}
+
+.characterIdentity {
+  position: absolute;
+  inset-block-start: max(0.72rem, env(safe-area-inset-top));
+  inset-inline-start: max(0.8rem, var(--safe-inline-start));
+  z-index: 50;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  color: #fffdf7;
+  text-shadow: 0 2px 15px rgb(0 0 0 / 80%);
+}
+
+.characterIdentity strong {
+  font-size: 0.72rem;
+  font-weight: 680;
+}
+
+.characterIdentity strong > span:last-child {
+  color: #fde7a9;
+}
+
+.srStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.caption {
+  position: absolute;
+  left: 50%;
+  inset-block-end: calc(8.25rem + env(safe-area-inset-bottom));
+  z-index: 55;
+  width: min(calc(100% - 2rem), 36rem);
+  translate: -50% 0;
+  text-align: center;
+  text-shadow: 0 2px 16px rgb(0 0 0 / 92%), 0 1px 3px rgb(0 0 0 / 95%);
+  pointer-events: none;
+}
+
+.caption > p:first-child {
+  color: #fffaf0;
+  font-size: clamp(1.18rem, 5.6vw, 1.85rem);
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.transliteration,
+.meaning {
+  margin-top: 0.12rem;
+  color: #ece8df;
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.meaning {
+  color: #d1cdc5;
+}
+
+.uiLayer {
+  z-index: 60;
+  pointer-events: none;
+}
+
+.guideLayer {
+  z-index: 70;
+  pointer-events: none;
+}
+
+.arrivalOverlay {
+  position: absolute;
+  inset-inline: max(1rem, var(--safe-inline-start)) max(1rem, var(--safe-inline-end));
+  inset-block-end: max(1rem, env(safe-area-inset-bottom));
+  z-index: 1;
+  display: grid;
+  width: min(100% - 2rem, 34rem);
+  gap: 0.45rem;
+  pointer-events: auto;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 90%);
+}
+
+.arrivalLocation {
+  color: #f4ddb0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.arrivalOverlay h1 {
+  max-width: 26rem;
+  color: #fffdf7;
+  font-size: clamp(1.45rem, 6vw, 2.75rem);
+  font-weight: 590;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+  outline: none;
+}
+
+.arrivalOverlay h1 span:last-child {
+  display: block;
+  margin-top: 0.12rem;
+  color: #f5dca5;
+  font-size: 0.72em;
+  letter-spacing: 0;
+}
+
+.arrivalMission {
+  display: grid;
+  max-width: 31rem;
+  gap: 0.08rem;
+  color: #f2eee5;
+  font-size: 0.73rem;
+  line-height: 1.45;
+}
+
+.arrivalMission span:last-child {
+  color: #e5d8bd;
+  font-size: 0.96em;
+}
+
+.arrivalActions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.2rem;
+}
+
+.beginButton,
+.primaryAction,
+.secondaryAction,
+.guidePrimary,
+.guideSecondary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding-inline: 1.1rem;
+  font-size: 0.72rem;
+  font-weight: 720;
+  text-decoration: none;
+}
+
+.beginButton,
+.primaryAction,
+.guidePrimary {
+  border: 1px solid var(--accent-border);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: var(--shadow-soft);
+}
+
+.secondaryAction,
+.guideSecondary {
+  border: 1px solid var(--border);
+  background: var(--surface-translucent);
+  color: var(--text-primary);
+  backdrop-filter: blur(14px);
+}
+
+.textAction {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: #e7e3db;
+  font-size: 0.66rem;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 28%);
+  text-underline-offset: 0.25rem;
+}
+
+.persistenceNote {
+  max-width: 29rem;
+  color: var(--warning);
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.turnControls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sceneContext {
+  position: absolute;
+  inset-block-start: 2rem;
+  inset-inline-start: max(0.8rem, var(--safe-inline-start));
+  color: #d2ccc2;
+  font-size: 0.54rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 90%);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.progressDots {
+  position: absolute;
+  inset-block-start: 0.88rem;
+  inset-inline-end: max(0.9rem, var(--safe-inline-end));
+  display: flex;
+  gap: 0.24rem;
+  pointer-events: none;
+}
+
+.progressDots > span {
+  width: 0.24rem;
+  height: 0.24rem;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 25%);
+}
+
+.progressDots > span[data-complete="true"] {
+  background: #f6d991;
+  box-shadow: 0 0 8px rgb(246 217 145 / 42%);
+}
+
+.voiceDock {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: max(0.55rem, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-areas:
+    "prompt prompt prompt"
+    "utilities microphone secondary"
+    "status status status";
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.22rem 0.45rem;
+  padding-inline: max(0.75rem, var(--safe-inline-start)) max(0.75rem, var(--safe-inline-end));
+  pointer-events: none;
+}
+
+.turnPrompt {
+  grid-area: prompt;
+  width: min(100%, 27rem);
+  justify-self: center;
+  color: #f5f1e8;
+  font-size: 0.64rem;
+  line-height: 1.35;
+  text-align: center;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 90%);
+}
+
+.turnPrompt p[lang="ar"] {
+  margin-top: 0.05rem;
+  color: #e8d9bb;
+  font-size: 0.7rem;
+}
+
+.transcriptPreview {
+  display: block;
+  max-width: 24rem;
+  margin: 0.22rem auto 0;
+  color: #fff4cf;
+  font-size: 0.7rem;
+}
+
+.micButton {
+  position: relative;
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  grid-area: microphone;
+  place-items: center;
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: 0 0 0 0.35rem rgb(6 10 8 / 36%), 0 12px 38px rgb(0 0 0 / 45%);
+  pointer-events: auto;
+}
+
+.micButton:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.micButton::before {
+  width: 0.72rem;
+  height: 1.15rem;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  content: "";
+}
+
+.micButton::after {
+  position: absolute;
+  inset-block-start: 2.16rem;
+  width: 1.15rem;
+  height: 0.62rem;
+  border: solid currentColor;
+  border-width: 0 2px 2px;
+  border-radius: 0 0 999px 999px;
+  content: "";
+}
+
+.micListening {
+  animation: microphone-listening 1.25s ease-out infinite;
+}
+
+.typeButton {
+  grid-area: secondary;
+  justify-self: end;
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: #f3efe7;
+  font-size: 0.64rem;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 90%);
+  pointer-events: auto;
+}
+
+.practiceButton {
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: #d9d3c8;
+  font-size: 0.58rem;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 90%);
+  pointer-events: auto;
+}
+
+.utilityControls {
+  display: flex;
+  min-width: 0;
+  grid-area: utilities;
+  align-items: center;
+  justify-self: start;
+  gap: 0.12rem;
+  pointer-events: auto;
+}
+
+.practiceIcon {
+  display: none;
+}
+
+.voiceStatus {
+  width: min(100%, 24rem);
+  min-height: 1.3em;
+  grid-area: status;
+  justify-self: center;
+  color: #c9c2b6;
+  font-size: 0.52rem;
+  line-height: 1.3;
+  text-align: center;
+  text-shadow: 0 2px 10px rgb(0 0 0 / 94%);
+  pointer-events: none;
+}
+
+.sheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4;
+  border: 0;
+  background: var(--overlay);
+  padding: 0;
+  pointer-events: auto;
+  backdrop-filter: blur(2px);
+}
+
+.responseSheet,
+.aidSheet {
+  position: fixed;
+  inset-inline: 0.65rem;
+  inset-block-end: max(0.65rem, env(safe-area-inset-bottom));
+  z-index: 5;
+  display: grid;
+  max-height: min(68dvh, 30rem);
+  gap: 0.55rem;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: linear-gradient(155deg, var(--surface-elevated), var(--surface));
+  padding: 0.85rem;
+  box-shadow: var(--shadow-elevated);
+  pointer-events: auto;
+  backdrop-filter: blur(24px);
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sheetHeader p {
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.sheetHeader span {
+  display: block;
+  margin-top: 0.12rem;
+  color: var(--text-muted);
+  font-size: 0.56rem;
+  font-weight: 450;
+}
+
+.sheetClose {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.responseChoices {
+  display: grid;
+  gap: 0.38rem;
+}
+
+.responseChoices button {
+  display: grid;
+  min-height: 3rem;
+  gap: 0.06rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.8rem;
+  background: var(--surface-hover);
+  padding: 0.5rem 0.65rem;
+  color: var(--text-primary);
+  text-align: start;
+}
+
+.responseChoices button:hover {
+  border-color: var(--accent-border);
+  background: var(--accent-muted);
+}
+
+.responseChoices strong {
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 560;
+}
+
+.responseChoices span,
+.responseChoices small {
+  color: var(--text-muted);
+  font-size: 0.64rem;
+}
+
+.textComposer {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.textComposer label {
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+}
+
+.textComposer > small {
+  color: var(--text-muted);
+  font-size: 0.6rem;
+  line-height: 1.4;
+}
+
+.textComposer > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.textComposer input {
+  min-width: 0;
+  min-height: 3rem;
+  border: 1px solid var(--border);
+  border-inline-end: 0;
+  border-radius: 0.75rem 0 0 0.75rem;
+  background: var(--surface-strong);
+  padding-inline: 0.75rem;
+  color: var(--text-primary);
+  font-family: var(--font-arabic);
+  outline: none;
+}
+
+[dir="rtl"] .textComposer input {
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.textComposer button {
+  min-height: 3rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 0 0.75rem 0.75rem 0;
+  background: var(--accent);
+  padding-inline: 1rem;
+  color: var(--accent-contrast);
+  font-size: 0.66rem;
+  font-weight: 720;
+}
+
+[dir="rtl"] .textComposer button {
+  border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.aidsRegion {
+  position: relative;
+  pointer-events: auto;
+}
+
+.helpButton {
+  display: inline-flex;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.38rem;
+  border: 0;
+  background: transparent;
+  color: #f3efe7;
+  font-size: 0.64rem;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 90%);
+}
+
+.helpButton > span:first-child {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 50%;
+  background: rgb(5 9 7 / 45%);
+  font-size: 0.7rem;
+}
+
+@media (max-width: 639px) {
+  .helpButton > span:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .practiceIcon {
+    display: inline;
+    letter-spacing: 0.08em;
+  }
+
+  .practiceLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.aidToggles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.aidToggles button {
+  min-height: 2.75rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+  font-size: 0.62rem;
+}
+
+.aidToggles button[aria-pressed="true"] {
+  border-color: var(--accent-border);
+  background: var(--accent-muted);
+  color: var(--text-primary);
+}
+
+.aidContent {
+  display: grid;
+  gap: 0.45rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.55rem;
+}
+
+.aidContent > p {
+  color: var(--text-secondary);
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+.vocabularyList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.vocabularyList > span {
+  display: grid;
+  gap: 0.04rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.7rem;
+  background: var(--surface-hover);
+  padding: 0.42rem 0.55rem;
+}
+
+.vocabularyList strong {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.vocabularyList small {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+}
+
+.sceneStatus {
+  position: absolute;
+  left: 50%;
+  inset-block-end: 1.1rem;
+  translate: -50% 0;
+  color: #d4c9b2;
+  font-size: 0.6rem;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 90%);
+}
+
+.guideScrim {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--overlay);
+  pointer-events: auto;
+  backdrop-filter: blur(2px);
+}
+
+.guidePanel,
+.completionOverlay,
+.errorOverlay {
+  display: grid;
+  width: min(calc(100% - 1.25rem), 34rem);
+  gap: 0.75rem;
+  margin-block-end: max(0.65rem, env(safe-area-inset-bottom));
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: linear-gradient(155deg, var(--surface-elevated), var(--surface));
+  padding: 0.95rem;
+  box-shadow: var(--shadow-elevated);
+}
+
+.guideHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.guideMark {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--accent-border);
+  border-radius: 50%;
+  color: var(--accent);
+  font-family: var(--font-arabic);
+}
+
+.guidePortrait {
+  position: relative;
+  display: grid;
+  width: 3.2rem;
+  height: 3.2rem;
+  flex: none;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid var(--accent-border);
+  border-radius: 42% 58% 52% 48% / 48% 44% 56% 52%;
+  color: var(--accent);
+  background: var(--accent-muted);
+  box-shadow: 0 9px 24px rgb(0 0 0 / 18%);
+  font-family: var(--font-arabic);
+}
+
+.guidePortrait img {
+  object-fit: cover;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+.guideHeader p {
+  color: var(--text-primary);
+  font-size: 0.7rem;
+  font-weight: 720;
+}
+
+.guideHeader span {
+  display: block;
+  margin-top: 0.08rem;
+  color: var(--accent);
+  font-size: 0.62rem;
+}
+
+.guideAnnouncement h2,
+.completionOverlay h1,
+.errorOverlay h2 {
+  color: var(--text-primary);
+  font-size: clamp(1.25rem, 5.4vw, 2rem);
+  font-weight: 580;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  outline: none;
+}
+
+.guideAnnouncement > p,
+.completionOverlay > p,
+.errorOverlay > p {
+  margin-top: 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.guideAlternative {
+  display: grid;
+  gap: 0.12rem;
+  margin-top: 0.65rem;
+  border-inline-start: 2px solid var(--accent-border);
+  padding-inline-start: 0.7rem;
+}
+
+.guideAlternative span,
+.guideAlternative small {
+  color: var(--text-muted);
+  font-size: 0.56rem;
+}
+
+.guideAlternative strong {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 560;
+}
+
+.guideActions,
+.completionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.completionMark {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  border: 1px solid var(--success);
+  border-radius: 50%;
+  background: var(--success-muted);
+  color: var(--success);
+}
+
+.sceneFailure {
+  display: grid;
+  height: 100%;
+  place-content: center;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  background: linear-gradient(155deg, var(--surface-elevated), var(--background));
+  text-align: center;
+}
+
+.sceneFailure h1 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.sceneFailure p {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+/* Abu Dhabi café: open contemporary room, service equipment, near counter. */
+.sceneCanvas[data-composition="abu-dhabi-cafe"] {
+  --scene-bg-position: 48% 50%;
+  --character-inline: 60%;
+  --character-width: min(98vw, 31rem);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-cafe"] .characterFigure {
+  filter: brightness(0.84) saturate(0.78) contrast(1.04) drop-shadow(0 1.5rem 2rem rgb(0 0 0 / 42%));
+}
+
+.sceneCanvas[data-composition="abu-dhabi-cafe"] [data-scene-object="espresso-bank"] {
+  inset: 13% auto 18% -4%;
+  width: 29%;
+  border-inline-end: 1px solid rgb(255 232 185 / 15%);
+  background: linear-gradient(90deg, rgb(7 8 7 / 44%), transparent);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-cafe"] [data-scene-object="pendant-pool"] {
+  inset-block-start: -8%;
+  left: 22%;
+  width: 26%;
+  height: 44%;
+  background: radial-gradient(ellipse, rgb(251 205 116 / 14%), transparent 62%);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-cafe"] [data-scene-object="stone-counter"] {
+  inset: auto -4% -7%;
+  height: 19%;
+  transform: perspective(420px) rotateX(58deg);
+  transform-origin: bottom;
+  border-block-start: 1px solid rgb(255 233 190 / 24%);
+  background: linear-gradient(180deg, rgb(72 54 38 / 88%), rgb(16 14 11 / 98%));
+  box-shadow: 0 -14px 35px rgb(0 0 0 / 28%);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-cafe"] [data-scene-object="coffee-cup"] {
+  right: 13%;
+  inset-block-end: 8%;
+  width: 2.6rem;
+  height: 1.8rem;
+  border: 1px solid rgb(255 240 204 / 24%);
+  border-radius: 0.25rem 0.25rem 0.8rem 0.8rem;
+  background: linear-gradient(90deg, #d8c5a7, #8a7558);
+  box-shadow: 0 0.3rem 0.8rem rgb(0 0 0 / 45%);
+}
+
+/* Abu Dhabi campus: broad open depth, colonnade, near bench and shade. */
+.sceneCanvas[data-composition="abu-dhabi-campus"] {
+  --scene-gold: 239 222 166;
+  --scene-mint: 111 188 181;
+  --scene-bg-position: 50% 50%;
+  --character-inline: 40%;
+  --character-width: min(100vw, 32rem);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-campus"] .characterFigure {
+  filter: brightness(0.84) saturate(0.76) contrast(1.03) drop-shadow(0 1.4rem 1.9rem rgb(0 0 0 / 38%));
+}
+
+[data-composition="abu-dhabi-campus"] .backgroundImage img {
+  filter: saturate(0.86) contrast(1.01) brightness(0.76);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-campus"] [data-scene-object="colonnade-shadow"] {
+  inset: 0 -4% 0 auto;
+  width: 34%;
+  background: linear-gradient(100deg, transparent, rgb(26 29 24 / 24%));
+  clip-path: polygon(32% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-campus"] [data-scene-object="campus-planter"] {
+  left: -3%;
+  inset-block-end: 11%;
+  width: 29%;
+  height: 15%;
+  border-block-start: 1px solid rgb(255 255 255 / 20%);
+  background: linear-gradient(180deg, rgb(172 155 119 / 55%), rgb(50 50 40 / 68%));
+  transform: skewX(-10deg);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-campus"] [data-scene-object="bench-edge"] {
+  right: -8%;
+  inset-block-end: 4%;
+  width: 48%;
+  height: 12%;
+  border-block-start: 0.3rem solid rgb(193 171 129 / 62%);
+  background: linear-gradient(180deg, rgb(70 61 48 / 78%), rgb(12 14 12 / 96%));
+  transform: skewX(-18deg);
+}
+
+.sceneCanvas[data-composition="abu-dhabi-campus"] [data-scene-object="palm-shadow"] {
+  inset: 4% -9% auto auto;
+  width: 54%;
+  height: 46%;
+  transform: rotate(-16deg);
+  background: repeating-linear-gradient(112deg, transparent 0 1.3rem, rgb(10 22 15 / 15%) 1.4rem 1.65rem);
+  filter: blur(3px);
+}
+
+/* Cairo café: tighter room, layered tables, near wood and glass. */
+.sceneCanvas[data-composition="cairo-cafe"] {
+  --scene-gold: 244 180 93;
+  --scene-mint: 165 93 54;
+  --scene-bg-position: 48% 50%;
+  --character-inline: 61%;
+  --character-width: min(96vw, 30rem);
+}
+
+.sceneCanvas[data-composition="cairo-cafe"] .characterFigure {
+  filter: brightness(0.8) saturate(0.74) contrast(1.05) drop-shadow(0 1.5rem 2rem rgb(0 0 0 / 48%));
+}
+
+.sceneCanvas[data-composition="cairo-cafe"] [data-scene-object="table-cluster"] {
+  left: -5%;
+  inset-block-end: 13%;
+  width: 42%;
+  height: 27%;
+  background:
+    radial-gradient(ellipse at 22% 72%, rgb(65 37 21 / 70%) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 75% 38%, rgb(82 45 22 / 62%) 0 16%, transparent 17%);
+  filter: blur(0.6px);
+}
+
+.sceneCanvas[data-composition="cairo-cafe"] [data-scene-object="hanging-bulbs"] {
+  inset: -4% 5% auto auto;
+  width: 36%;
+  height: 30%;
+  background:
+    radial-gradient(circle at 18% 35%, rgb(255 191 90 / 28%) 0 3%, transparent 7%),
+    radial-gradient(circle at 72% 18%, rgb(255 191 90 / 22%) 0 3%, transparent 7%);
+}
+
+.sceneCanvas[data-composition="cairo-cafe"] [data-scene-object="wood-table"] {
+  inset: auto -7% -8%;
+  height: 21%;
+  transform: perspective(430px) rotateX(58deg);
+  transform-origin: bottom;
+  border-block-start: 1px solid rgb(255 205 132 / 19%);
+  background: linear-gradient(180deg, rgb(76 39 20 / 92%), rgb(20 10 7 / 98%));
+}
+
+.sceneCanvas[data-composition="cairo-cafe"] [data-scene-object="tea-glass"] {
+  left: 16%;
+  inset-block-end: 7%;
+  width: 1.35rem;
+  height: 2.1rem;
+  border: 1px solid rgb(255 224 173 / 38%);
+  border-radius: 0.2rem 0.2rem 0.45rem 0.45rem;
+  background: linear-gradient(180deg, transparent 30%, rgb(161 75 24 / 72%) 31%);
+  box-shadow: 0 0.4rem 0.8rem rgb(0 0 0 / 42%);
+}
+
+/* Cairo taxi: moving city beyond a cabin frame, driver, dashboard and wheel. */
+.sceneCanvas[data-composition="cairo-taxi"] {
+  --scene-gold: 244 189 101;
+  --scene-mint: 72 144 160;
+  --scene-bg-position: 50% 46%;
+  --character-inline: 27%;
+  --character-block: -5%;
+  --character-width: min(96vw, 31rem);
+}
+
+.sceneCanvas[data-composition="cairo-taxi"] .characterFigure {
+  filter: brightness(0.76) saturate(0.76) contrast(1.06) drop-shadow(0 1.5rem 2rem rgb(0 0 0 / 52%));
+}
+
+[data-composition="cairo-taxi"] .backgroundImage img {
+  filter: saturate(0.9) contrast(1.05) brightness(0.7);
+}
+
+.sceneCanvas[data-composition="cairo-taxi"] [data-scene-object="windshield-frame"] {
+  inset: -8% -6% 12%;
+  border: solid rgb(3 7 8 / 78%);
+  border-width: 3.7rem 3rem 0;
+  border-radius: 28% 28% 0 0;
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 55%);
+}
+
+.sceneCanvas[data-composition="cairo-taxi"] [data-scene-object="rear-view-mirror"] {
+  inset-block-start: 8%;
+  left: 48%;
+  width: 5.8rem;
+  height: 1.55rem;
+  border: 0.28rem solid #080a09;
+  border-radius: 0.35rem;
+  background: linear-gradient(145deg, #323b3b, #080c0d);
+  box-shadow: 0 0.45rem 0.9rem rgb(0 0 0 / 42%);
+}
+
+.sceneCanvas[data-composition="cairo-taxi"] [data-scene-object="dashboard"] {
+  inset: auto -5% -8%;
+  height: 27%;
+  border-block-start: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 46% 46% 0 0 / 22% 22% 0 0;
+  background: linear-gradient(180deg, #1d2626 0%, #080c0c 52%, #030504 100%);
+  box-shadow: 0 -1rem 2rem rgb(0 0 0 / 32%);
+}
+
+.sceneCanvas[data-composition="cairo-taxi"] [data-scene-object="steering-wheel"] {
+  left: 8%;
+  inset-block-end: 3%;
+  width: 8.5rem;
+  height: 8.5rem;
+  border: 0.75rem solid #080b0b;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 7%), 0 0.5rem 1.5rem rgb(0 0 0 / 50%);
+}
+
+@keyframes light-pass {
+  from { opacity: 0.11; transform: translate3d(-4%, -1%, 0) rotate(-4deg); }
+  to { opacity: 0.28; transform: translate3d(12%, 4%, 0) rotate(1deg); }
+}
+
+@keyframes ambient-drift {
+  from { opacity: 0.12; transform: translate3d(0, 0, 0); }
+  to { opacity: 0.3; transform: translate3d(-0.7rem, 0.85rem, 0); }
+}
+
+@keyframes character-enter {
+  from { opacity: 0; scale: 0.985; translate: -50% 0.9rem; }
+  to { opacity: 1; scale: 1; translate: -50% 0; }
+}
+
+@keyframes microphone-listening {
+  0% { box-shadow: 0 0 0 0.35rem rgb(6 10 8 / 36%), 0 12px 38px rgb(0 0 0 / 45%); }
+  70% { box-shadow: 0 0 0 0.9rem rgb(var(--scene-gold) / 0%), 0 12px 38px rgb(0 0 0 / 45%); }
+  100% { box-shadow: 0 0 0 0.35rem rgb(var(--scene-gold) / 0%), 0 12px 38px rgb(0 0 0 / 45%); }
+}
+
+@media (min-width: 640px) {
+  .sceneCanvas {
+    --character-width: min(67vw, 38rem);
+  }
+
+  .caption {
+    inset-block-end: calc(8.5rem + env(safe-area-inset-bottom));
+  }
+
+  .responseSheet,
+  .aidSheet {
+    left: 50%;
+    right: auto;
+    width: min(calc(100% - 2rem), 34rem);
+    translate: -50% 0;
+  }
+
+  .arrivalOverlay {
+    inset-inline-start: max(1.5rem, var(--safe-inline-start));
+    inset-inline-end: auto;
+    inset-block-end: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .sceneCanvas[data-composition="abu-dhabi-cafe"] { --character-inline: 62%; }
+  .sceneCanvas[data-composition="abu-dhabi-campus"] { --character-inline: 40%; }
+  .sceneCanvas[data-composition="cairo-cafe"] { --character-inline: 63%; }
+  .sceneCanvas[data-composition="cairo-taxi"] { --character-inline: 31%; }
+}
+
+@media (min-width: 1024px) {
+  .sceneCanvas {
+    --character-width: min(43vw, 39rem);
+  }
+
+  .caption {
+    left: auto;
+    inset-inline-start: clamp(1.8rem, 5vw, 5rem);
+    inset-block-end: 1.75rem;
+    width: min(38vw, 34rem);
+    translate: 0 0;
+    text-align: start;
+  }
+
+  .caption > p:first-child {
+    font-size: clamp(1.45rem, 2.1vw, 2.15rem);
+  }
+
+  .voiceDock {
+    inset-inline: auto max(1.4rem, var(--safe-inline-end));
+    inset-block-end: max(1.25rem, env(safe-area-inset-bottom));
+    width: min(38vw, 31rem);
+    padding: 0;
+  }
+
+  .turnPrompt {
+    width: min(100%, 29rem);
+  }
+
+  .responseSheet,
+  .aidSheet {
+    inset-inline: auto max(1.25rem, var(--safe-inline-end));
+    inset-block-end: max(1.25rem, env(safe-area-inset-bottom));
+    width: min(38vw, 32rem);
+    translate: 0 0;
+  }
+
+  .guideScrim {
+    align-items: stretch;
+    justify-content: flex-end;
+    background: linear-gradient(90deg, transparent, var(--overlay));
+  }
+
+  [dir="rtl"] .guideScrim {
+    background: linear-gradient(270deg, transparent, var(--overlay));
+  }
+
+  .guidePanel,
+  .completionOverlay,
+  .errorOverlay {
+    width: min(39vw, 34rem);
+    margin: 1rem;
+    align-content: center;
+  }
+
+  .guidePortrait {
+    width: 4.7rem;
+    height: 4.7rem;
+  }
+
+  .arrivalOverlay {
+    inset-inline-start: clamp(2rem, 5vw, 5.5rem);
+    inset-block-end: clamp(2rem, 6vh, 4.5rem);
+  }
+
+  .sceneCanvas[data-composition="abu-dhabi-cafe"] {
+    --character-inline: 67%;
+    --scene-bg-position: 50% 50%;
+  }
+
+  .sceneCanvas[data-composition="abu-dhabi-campus"] {
+    --character-inline: 39%;
+    --scene-bg-position: 50% 50%;
+  }
+
+  .sceneCanvas[data-composition="cairo-cafe"] {
+    --character-inline: 69%;
+    --scene-bg-position: 48% 50%;
+  }
+
+  .sceneCanvas[data-composition="cairo-taxi"] {
+    --character-inline: 29%;
+    --character-width: min(42vw, 37rem);
+    --scene-bg-position: 50% 44%;
+  }
+}
+
+@media (max-height: 690px) {
+  .caption {
+    inset-block-end: calc(7.6rem + env(safe-area-inset-bottom));
+  }
+
+  .caption > p:first-child {
+    font-size: 1.05rem;
+  }
+
+  .turnPrompt {
+    font-size: 0.6rem;
+  }
+
+  .micButton {
+    width: 3.7rem;
+    height: 3.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambientLayer > span {
+    animation: none !important;
+  }
+
+  .characterFigure {
+    animation: none !important;
+  }
+
+  .backgroundLayer,
+  .midgroundLayer,
+  .characterLayer,
+  .foregroundLayer {
+    transform: none !important;
+  }
+}

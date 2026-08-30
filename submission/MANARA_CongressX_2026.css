@@ -1,0 +1,322 @@
+@font-face {
+  font-family: "Dubai Submission";
+  src: local("Dubai"), local("Dubai Regular");
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Dubai Submission";
+  src: local("Dubai Medium");
+  font-style: normal;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Dubai Submission";
+  src: local("Dubai Bold");
+  font-style: normal;
+  font-weight: 700;
+}
+
+:root {
+  --ink: #09130f;
+  --green: #12261e;
+  --green-2: #1d3a2d;
+  --teal: #315d58;
+  --mint: #83baa2;
+  --gold: #efcf80;
+  --gold-bright: #ffe7a8;
+  --ivory: #f5efe4;
+  --paper: #fffaf0;
+  --stone: #c9c0b2;
+  --rust: #a95c39;
+  --white: #fffdf8;
+}
+
+* { box-sizing: border-box; }
+
+@page { size: A4 portrait; margin: 0; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #343b37;
+  color: var(--ink);
+  font-family: "Segoe UI", Arial, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body { font-size: 10.6pt; }
+
+.document { margin: 0 auto; width: 210mm; }
+
+.page {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  page-break-after: always;
+}
+
+.page:last-child { page-break-after: auto; }
+
+.page-one,
+.page-three {
+  background:
+    radial-gradient(circle at 18% 4%, rgb(239 207 128 / 10%), transparent 30%),
+    radial-gradient(circle at 94% 76%, rgb(82 136 112 / 13%), transparent 32%),
+    var(--ink);
+  color: var(--ivory);
+}
+
+.page-two { background: var(--ivory); color: var(--ink); }
+
+.page-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 1.6%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 1.6%) 1px, transparent 1px);
+  background-size: 8mm 8mm;
+  mask-image: linear-gradient(to bottom, black, transparent 48%);
+}
+
+.masthead {
+  position: absolute;
+  z-index: 4;
+  top: 14mm;
+  right: 15mm;
+  left: 15mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-lockup { display: flex; align-items: center; gap: 3mm; color: var(--ivory); }
+.brand-latin { font-size: 11pt; font-weight: 700; letter-spacing: .28em; }
+.brand-rule { width: 9mm; height: 1px; background: rgb(239 207 128 / 50%); }
+.brand-arabic { color: var(--gold); font-family: "Dubai Submission", Tahoma, Arial, sans-serif; font-size: 14pt; font-weight: 600; }
+
+.award-lockup { display: grid; gap: 1mm; text-align: right; }
+.award-lockup span { color: rgb(245 239 228 / 54%); font-size: 6.4pt; font-weight: 600; letter-spacing: .16em; }
+.award-lockup strong { color: var(--gold); font-size: 7.5pt; letter-spacing: .22em; }
+
+.hero-copy {
+  position: absolute;
+  z-index: 3;
+  top: 37mm;
+  left: 15mm;
+  width: 112mm;
+}
+
+.eyebrow {
+  margin: 0 0 4mm;
+  color: var(--gold);
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: .24em;
+  line-height: 1.2;
+}
+
+.hero-copy h1,
+.section-header h2 {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 650;
+  letter-spacing: -.055em;
+  line-height: .93;
+}
+
+.hero-copy h1 { font-size: 35.5pt; }
+.hero-copy h1 em,
+.section-header h2 em { color: var(--gold); font-style: normal; }
+
+.hero-deck {
+  width: 105mm;
+  margin: 6mm 0 0;
+  color: rgb(245 239 228 / 78%);
+  font-size: 10.6pt;
+  line-height: 1.52;
+}
+
+.hero-visual {
+  position: absolute;
+  z-index: 2;
+  top: 133mm;
+  right: 12mm;
+  left: 12mm;
+  height: 124mm;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgb(239 207 128 / 25%);
+  border-radius: 8mm;
+  background: #0b1a16;
+  box-shadow: 0 10mm 26mm rgb(0 0 0 / 42%);
+}
+
+.hero-topography {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 18% 48%, transparent 0 13%, rgb(239 207 128 / 7%) 13.3% 13.6%, transparent 14% 21%, rgb(239 207 128 / 5%) 21.3% 21.6%, transparent 22%),
+    radial-gradient(ellipse at 26% 52%, rgb(70 116 94 / 18%), transparent 35%),
+    linear-gradient(135deg, #07110e, #0d211a 58%, #0a1713);
+}
+.hero-cafe { position: absolute; top: 0; right: 0; bottom: 0; width: 62%; background: url("assets/abu-dhabi-cafe.webp") 52% center / cover no-repeat; mask-image: linear-gradient(to right, transparent 0, black 26%); }
+.hero-vignette { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(4 15 12 / 72%), transparent 45%, rgb(4 9 7 / 18%)), linear-gradient(0deg, rgb(4 8 6 / 70%), transparent 42%); }
+
+.hero-mariam { position: absolute; z-index: 5; right: -4mm; bottom: -30mm; height: 142mm; filter: drop-shadow(-7mm 5mm 8mm rgb(0 0 0 / 38%)); }
+
+.network-card {
+  position: absolute;
+  z-index: 4;
+  top: 9mm;
+  left: 9mm;
+  width: 102mm;
+  height: 68mm;
+  overflow: hidden;
+  border: 1px solid rgb(239 207 128 / 22%);
+  border-radius: 5mm;
+  background: rgb(8 21 17 / 94%);
+  box-shadow: 0 5mm 15mm rgb(0 0 0 / 28%);
+  backdrop-filter: blur(8px);
+}
+
+.network-card-head { position: absolute; z-index: 3; top: 4mm; right: 5mm; left: 5mm; display: flex; justify-content: space-between; align-items: center; }
+.network-card-head span { color: var(--gold); font-size: 6pt; letter-spacing: .22em; }
+.network-card-head strong { color: rgb(245 239 228 / 64%); font-size: 6pt; letter-spacing: .14em; }
+.network-svg { display: block; width: 100%; height: 100%; }
+.network-svg-small { padding-top: 4mm; }
+.regional-fields path { fill: rgb(51 93 76 / 24%); stroke: rgb(131 186 162 / 21%); stroke-width: 1.5; }
+.regional-fields path:nth-child(2) { fill: rgb(80 78 44 / 24%); }
+.regional-fields path:nth-child(3) { fill: rgb(93 72 43 / 20%); }
+.network-contours path { fill: none; stroke: rgb(239 207 128 / 13%); stroke-width: 1.4; }
+.journey-arc { fill: none; stroke: var(--gold); stroke-width: 2.6; stroke-linecap: round; filter: drop-shadow(0 0 6px rgb(239 207 128 / 70%)); }
+.node-halo { fill: none; stroke-width: 1.6; }
+.node-dot.node-future { fill: #78a992; opacity: .62; }
+.node-halo.node-future { stroke: transparent; }
+.node-dot.node-preview { fill: var(--ivory); }
+.node-halo.node-preview { stroke: var(--ivory); opacity: .4; }
+.node-dot.node-active { fill: var(--gold-bright); }
+.node-halo.node-active { fill: rgb(239 207 128 / 12%); stroke: var(--gold); opacity: .95; }
+.map-city-label { fill: var(--ivory); font: 700 13px "Segoe UI", Arial, sans-serif; letter-spacing: 1.1px; paint-order: stroke; stroke: #09130f; stroke-width: 4px; }
+.map-city-label.label-preview { fill: #c9c0b2; }
+
+.transition-beacon { position: absolute; z-index: 4; top: 72mm; left: 103mm; width: 28mm; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); transform: rotate(10deg); transform-origin: left; }
+.transition-beacon span { position: absolute; top: -1.5mm; left: 0; width: 3mm; height: 3mm; border-radius: 50%; background: var(--gold-bright); box-shadow: 0 0 0 2mm rgb(239 207 128 / 13%), 0 0 6mm var(--gold); }
+
+.hero-destination { position: absolute; z-index: 6; right: 10mm; bottom: 8mm; display: grid; justify-items: end; color: var(--ivory); text-shadow: 0 1mm 3mm #000; }
+.hero-destination span { color: var(--gold); font-size: 6pt; letter-spacing: .22em; }
+.hero-destination strong { font-size: 14pt; letter-spacing: .06em; }
+.hero-destination b { color: var(--gold-bright); font-family: "Dubai Submission", Tahoma, sans-serif; font-size: 12pt; }
+.hero-visual figcaption,
+.experience-stage figcaption { position: absolute; z-index: 7; bottom: 4mm; left: 5mm; color: rgb(245 239 228 / 54%); font-size: 6pt; letter-spacing: .12em; text-transform: uppercase; }
+
+.proof-row { position: absolute; right: 15mm; bottom: 18mm; left: 15mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; }
+.proof-row div { display: grid; grid-template-columns: auto 1fr; gap: 3mm; align-items: center; border-top: 1px solid rgb(239 207 128 / 28%); padding-top: 3mm; }
+.proof-row strong { color: var(--gold); font-size: 20pt; font-weight: 500; line-height: 1; }
+.proof-row span { color: rgb(245 239 228 / 66%); font-size: 7.4pt; line-height: 1.35; }
+
+.page-footer { position: absolute; z-index: 8; right: 15mm; bottom: 6mm; left: 15mm; display: flex; justify-content: space-between; color: rgb(245 239 228 / 38%); font-size: 6pt; font-weight: 600; letter-spacing: .16em; }
+.page-footer span:first-child { font-family: "Dubai Submission", "Segoe UI", sans-serif; }
+
+.section-header { position: absolute; z-index: 3; top: 15mm; right: 15mm; left: 15mm; }
+.section-header-dark h2 { width: 126mm; font-size: 31pt; }
+.section-header-dark > p:last-child { position: absolute; top: 8mm; right: 0; width: 53mm; margin: 0; color: #526159; font-size: 10pt; line-height: 1.48; }
+.section-header-dark .eyebrow { color: #8c5d26; }
+
+.experience-stage { position: absolute; top: 69mm; right: 12mm; left: 12mm; height: 102mm; margin: 0; overflow: hidden; border-radius: 7mm; background: #5c4934; box-shadow: 0 8mm 20mm rgb(75 55 31 / 24%); }
+.experience-background { position: absolute; inset: 0; background: url("assets/abu-dhabi-cafe.webp") center / cover no-repeat; }
+.experience-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(13 12 9 / 55%), transparent 43%, rgb(13 12 9 / 15%)), linear-gradient(0deg, rgb(7 9 7 / 67%), transparent 48%); }
+.experience-mariam { position: absolute; right: 10mm; bottom: -21mm; height: 119mm; filter: drop-shadow(-6mm 3mm 6mm rgb(0 0 0 / 28%)); }
+.character-label { position: absolute; top: 7mm; left: 8mm; display: grid; gap: .7mm; color: var(--ivory); }
+.character-label span { color: var(--gold); font-size: 6.5pt; font-weight: 700; letter-spacing: .18em; }
+.character-label strong { font-size: 14pt; letter-spacing: .05em; }
+.character-label strong b { margin-left: 1.5mm; color: var(--gold-bright); font-family: "Dubai Submission", Tahoma, sans-serif; font-size: 13pt; }
+.character-label small { color: rgb(245 239 228 / 68%); font-size: 7.5pt; }
+.speech-line { position: absolute; bottom: 12mm; left: 8mm; width: 80mm; color: var(--white); font-family: "Dubai Submission", Tahoma, Arial, sans-serif; font-size: 19pt; font-weight: 700; line-height: 1.25; text-shadow: 0 1.5mm 4mm #000; }
+
+.voice-chip { position: absolute; bottom: 7mm; left: 96mm; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto; column-gap: 2.5mm; align-items: center; min-width: 37mm; border: 1px solid rgb(239 207 128 / 35%); border-radius: 99px; background: rgb(8 19 15 / 78%); padding: 2.5mm 4mm 2.5mm 3mm; color: var(--ivory); }
+.mic-symbol { grid-row: 1 / 3; width: 8mm; height: 8mm; border-radius: 50%; background: var(--gold); box-shadow: inset 0 0 0 2.8mm #16251e; }
+.voice-chip strong { font-size: 7.4pt; letter-spacing: .15em; }
+.voice-chip small { color: rgb(245 239 228 / 58%); font-size: 6.5pt; }
+
+.guide-cut-in { position: absolute; z-index: 5; right: 6mm; bottom: 5mm; display: grid; grid-template-columns: 18mm 1fr; gap: 3mm; width: 68mm; border: 1px solid rgb(239 207 128 / 36%); border-radius: 5mm; background: rgb(248 241 227 / 95%); padding: 3mm; color: var(--ink); box-shadow: 0 5mm 18mm rgb(0 0 0 / 30%); }
+.guide-cut-in img { width: 18mm; height: 18mm; border-radius: 50%; object-fit: cover; }
+.guide-cut-in div { display: grid; align-content: center; gap: .8mm; }
+.guide-cut-in span { color: #795326; font-size: 5.5pt; font-weight: 700; letter-spacing: .1em; }
+.guide-cut-in span b { font-family: "Dubai Submission", Tahoma, sans-serif; }
+.guide-cut-in strong { font-size: 8pt; line-height: 1.22; }
+.guide-cut-in p { margin: 0; color: #59655f; font-size: 6.4pt; line-height: 1.25; }
+
+.journey-flow { position: absolute; top: 180mm; right: 15mm; left: 15mm; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5mm; }
+.journey-flow article { position: relative; min-height: 38mm; border-top: 1px solid #c7b798; padding-top: 4mm; }
+.journey-flow article:not(:last-child)::after { content: ""; position: absolute; top: -1px; right: -4mm; width: 3mm; height: 1px; background: #8c5d26; }
+.step-number { position: absolute; top: 3.5mm; right: 0; color: #aa936a; font-size: 7pt; font-weight: 700; }
+.journey-flow h3 { margin: 0 0 2mm; color: #8c5d26; font-size: 9.5pt; letter-spacing: .14em; }
+.journey-flow p { margin: 0; color: #44534b; font-size: 8.4pt; line-height: 1.38; }
+
+.interaction-strip { position: absolute; top: 228mm; right: 15mm; left: 15mm; display: grid; grid-template-columns: 1fr 7mm 1.25fr 7mm 1fr; align-items: stretch; min-height: 31mm; border: 1px solid #d5c7ae; border-radius: 5mm; background: #fffaf1; box-shadow: 0 3mm 12mm rgb(75 55 31 / 10%); }
+.interaction-cell { display: grid; align-content: center; gap: 1mm; padding: 4mm 5mm; }
+.interaction-cell span { color: #8c6b42; font-size: 5.8pt; font-weight: 700; letter-spacing: .14em; }
+.interaction-cell strong { font-size: 8.5pt; line-height: 1.25; }
+.interaction-cell > strong[lang="ar"] { font-family: "Dubai Submission", Tahoma, Arial, sans-serif; font-size: 17pt; }
+.interaction-cell.understood strong { font-size: 7.2pt; letter-spacing: .06em; }
+.interaction-cell.understood b { color: #31705a; }
+.interaction-cell.local-option { background: #e8e0cb; border-radius: 0 5mm 5mm 0; }
+.interaction-arrow { display: grid; place-items: center; color: #9c7748; font-size: 14pt; }
+.mechanism-note { position: absolute; top: 263mm; right: 27mm; left: 27mm; margin: 0; color: #58645d; font-size: 8.2pt; font-style: italic; line-height: 1.35; text-align: center; }
+.page-footer-light { color: rgb(9 19 15 / 38%); }
+
+.section-header-wide { top: 17mm; }
+.section-header-wide h2 { width: 180mm; font-size: 29pt; }
+.systems-grid { position: absolute; top: 66mm; right: 13mm; left: 13mm; display: grid; grid-template-columns: .92fr 1.08fr; gap: 6mm; height: 112mm; }
+.system-panel { min-width: 0; border: 1px solid rgb(239 207 128 / 18%); border-radius: 6mm; background: rgb(18 38 30 / 76%); padding: 5mm; box-shadow: 0 5mm 18mm rgb(0 0 0 / 22%); }
+.panel-kicker { display: grid; gap: 1mm; margin-bottom: 3.5mm; }
+.panel-kicker span { color: var(--gold); font-size: 6pt; font-weight: 700; letter-spacing: .2em; }
+.panel-kicker strong { color: var(--ivory); font-size: 9pt; letter-spacing: .06em; }
+.system-panel > p { margin: 3.5mm 0 0; color: rgb(245 239 228 / 72%); font-size: 8.4pt; line-height: 1.42; }
+.system-panel > small { display: block; margin-top: 2mm; color: rgb(245 239 228 / 38%); font-size: 5.6pt; letter-spacing: .12em; text-transform: uppercase; }
+.fumble-frame { position: relative; height: 56mm; overflow: hidden; border-radius: 4mm; background: #101a15; }
+.fumble-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 100% 35%; opacity: .78; }
+.fumble-frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgb(7 16 12 / 80%), transparent 60%); }
+.fumble-overlay { position: absolute; z-index: 2; right: 4mm; bottom: 4mm; left: 4mm; display: grid; color: var(--ivory); }
+.fumble-overlay span { color: var(--gold); font-size: 5.5pt; letter-spacing: .15em; }
+.fumble-overlay strong { font-size: 13pt; letter-spacing: -.02em; }
+.scale-map { position: relative; height: 66mm; overflow: hidden; border-radius: 4mm; background: radial-gradient(circle at 70% 45%, rgb(70 116 94 / 25%), transparent 32%), #0a1712; }
+.network-svg-large { position: absolute; inset: 0 0 8mm; height: calc(100% - 8mm); }
+.network-svg-large .map-city-label { font-size: 12px; }
+.map-legend { position: absolute; right: 3mm; bottom: 2.5mm; left: 3mm; display: flex; justify-content: space-between; color: rgb(245 239 228 / 58%); font-size: 5.4pt; }
+.map-legend span { display: flex; align-items: center; gap: 1.2mm; }
+.map-legend i { display: inline-block; width: 2mm; height: 2mm; border-radius: 50%; }
+.active-dot { background: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.preview-dot { border: 1px solid var(--ivory); }
+.future-dot { background: #78a992; opacity: .65; }
+.active-destinations { display: flex; justify-content: space-between; align-items: center; margin-top: 3mm; border-top: 1px solid rgb(239 207 128 / 16%); padding-top: 2.5mm; }
+.active-destinations strong { color: var(--gold); font-size: 7.2pt; letter-spacing: .1em; }
+.active-destinations span { color: rgb(245 239 228 / 52%); font-size: 6.2pt; }
+
+.principles { position: absolute; top: 189mm; right: 13mm; left: 13mm; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+.principles article { border-top: 1px solid rgb(239 207 128 / 30%); padding-top: 4mm; }
+.principles span { color: var(--gold); font-size: 5.8pt; font-weight: 700; letter-spacing: .17em; }
+.principles h3 { margin: 2mm 0; color: var(--ivory); font-size: 11pt; line-height: 1.12; letter-spacing: -.02em; }
+.principles p { margin: 0; color: rgb(245 239 228 / 62%); font-size: 7.8pt; line-height: 1.42; }
+
+.impact-statement { position: absolute; right: 13mm; bottom: 17mm; left: 13mm; display: grid; grid-template-columns: .8fr 1.2fr; gap: 14mm; align-items: end; border-top: 1px solid rgb(239 207 128 / 28%); padding-top: 5mm; }
+.impact-statement p { margin: 0; color: rgb(245 239 228 / 68%); font-size: 8.7pt; line-height: 1.5; }
+.impact-statement strong { color: var(--gold-bright); font-size: 15.5pt; line-height: 1.12; letter-spacing: -.025em; }
+
+[lang="ar"] { font-family: "Dubai Submission", Tahoma, Arial, sans-serif; }
+
+@media screen {
+  .page { margin-bottom: 14px; box-shadow: 0 8px 40px rgb(0 0 0 / 32%); }
+}
+
+@media print {
+  html, body { background: transparent; }
+  .document { width: auto; }
+  .page { margin: 0; box-shadow: none; }
+}

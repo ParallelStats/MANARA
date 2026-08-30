@@ -1,0 +1,130 @@
+MANARA | منارة
+CONGRESS X YOUTH INNOVATION AWARDS 2026
+SMART ARABIC
+
+PAGE 1
+
+TRAVEL THE ARAB WORLD THROUGH ITS ARABIC.
+
+YOUR ARABIC DOESN'T RESTART AT THE BORDER.
+IT EVOLVES.
+
+Arabic learners often discover that knowing Arabic is not the same as knowing what feels natural in a particular place. MANARA turns the Arab world into an immersive learning journey, helping each learner adapt the Arabic they already know - even if that is none - to real people, situations and everyday speech.
+
+THE ARAB WORLD
+39 CITY NODES
+CAIRO
+ABU DHABI
+CASABLANCA
+
+ARRIVE IN
+ABU DHABI
+أبوظبي
+
+Illustrative prototype interface
+
+39 real city nodes in the network vision
+4 immersive prototype scenarios
+4 learner starting points supported
+
+01 / 03
+
+PAGE 2
+
+THE LEARNING MOMENT
+
+ONE CONVERSATION.
+ONE USEFUL SHIFT.
+
+MANARA begins with communication, then adds context only when it helps. The learner never leaves the social moment to enter a lesson screen.
+
+LOCAL CHARACTER
+MARIAM | مريم
+The person you are speaking with
+
+مرحبا، حيّاك. شو تحب تطلب؟
+
+SPEAK
+or type instead
+
+LOCAL GUIDE - REEM | ريم
+“That works. Here, you can try...”
+Appears briefly only when adaptation is useful.
+
+Illustrative prototype interaction
+
+01 - ARRIVE
+Choose Abu Dhabi. Enter a café with a clear social goal.
+
+02 - SPEAK
+Hear Arabic, then answer by voice, text or a safe practice choice.
+
+03 - ADAPT
+If meaning is clear, the Local Guide may offer one more locally useful option.
+
+04 - REUSE
+Try it immediately. The Local Character continues naturally.
+
+YOU SAY
+عايز قهوة
+
+MANARA UNDERSTANDS
+MEANING COMMUNICATED ✓
+
+TRY IN THIS MOMENT
+أبغي قهوة
+
+The mechanism is the innovation: understand first, add context with care, then let the learner reuse it without breaking immersion.
+
+02 / 03
+
+PAGE 3
+
+FROM ONE MOMENT TO A LEARNING SYSTEM
+
+PERSONAL ENOUGH TO REMEMBER.
+STRUCTURED ENOUGH TO SCALE.
+
+PERSONAL
+YOUR FUMBLE MAP
+
+MANARA IS LEARNING
+HOW YOU LEARN.
+
+Your Fumble Map turns completed conversations into a small, useful picture of communication strengths, successful retries, local adaptation and concepts worth revisiting. It is not a grade. It is a record of movement.
+
+Direct prototype screen
+
+SCALABLE
+THE ARAB WORLD AS A LEARNING NETWORK
+
+ACTIVE PROTOTYPE
+PREVIEW
+NETWORK VISION
+CAIRO
+ABU DHABI
+CASABLANCA
+
+The prototype activates Abu Dhabi and Cairo across four scenarios, previews Casablanca, and places them inside a 39-city network vision. The same destination and scenario structure can expand city by city as content is reviewed.
+
+ABU DHABI + CAIRO
+4 active prototype scenarios
+
+ARABIC-CENTERED
+VARIATION IS CONTEXT, NOT FAILURE.
+MANARA respects MSA, dialect and heritage Arabic as knowledge the learner can carry forward.
+
+PERSONAL BY DESIGN
+SUPPORT CHANGES. ACCESS DOES NOT.
+Beginners, MSA learners, dialect learners and heritage speakers enter the same world from different starting points.
+
+TECHNICALLY FEASIBLE
+TEACHING LOGIC STAYS IN CONTROL.
+Optional conversational AI can make interactions more flexible; it does not decide what MANARA teaches.
+
+MANARA moves Arabic beyond classroom abstraction. Place, culture and social context become part of the learning moment - without asking learners to discard the Arabic they already carry.
+
+LEARN ARABIC NOT AS ONE DESTINATION,
+BUT AS A WORLD YOU CAN MOVE THROUGH.
+
+03 / 03
