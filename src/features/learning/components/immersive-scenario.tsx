@@ -418,47 +418,70 @@ export function ImmersiveScenario({
     return evaluation;
   }, [currentBeat, destination.id, profile, scenario, updateProfile]);
 
-  const submitResponse = useCallback(async (
-    learnerInput: string,
-    inputMode: EvaluationResult["inputMode"],
-    option: LearnerResponseOption | null,
-  ) => {
-    if (!currentBeat || phase !== "ready") return;
-    const operation = operationGate.start();
-    if (!operation) return;
-    clearPendingTimer();
-    setPhase("processing");
-    setVisualState("thinking");
-    setPendingOption(option);
-    setGeneratedLine(null);
+ const submitResponse = useCallback(async (
+  learnerInput: string,
+  inputMode: EvaluationResult["inputMode"],
+  option: LearnerResponseOption | null,
+) => {
+  if (!currentBeat || phase !== "ready") return;
 
-    const presentDeterministicClarification = () => {
-      setPendingOption(null);
-      setGeneratedLine(deterministicClarificationLine(
+  const operation = operationGate.start();
+  if (!operation) return;
+
+  clearPendingTimer();
+  setPhase("processing");
+  setVisualState("thinking");
+  setPendingOption(option);
+  setGeneratedLine(null);
+
+  const presentDeterministicClarification = () => {
+    setPendingOption(null);
+    setGeneratedLine(
+      deterministicClarificationLine(
         operation.id,
         scenario.id,
         character.id,
         currentBeat.prompt.ar,
         currentBeat.prompt.en,
-      ));
-      operationGate.finish(operation.id);
-      setPhase("character_speaking");
-      setVisualState("clarification_reaction");
-    };
+      ),
+    );
+    operationGate.finish(operation.id);
+    setPhase("character_speaking");
+    setVisualState("clarification_reaction");
+  };
 
-    try {
-      const evaluation = evaluateResponse(learnerInput, inputMode, option);
-      if (!evaluation) throw new Error("Evaluation could not start.");
-      let resolvedOption = option;
+  try {
+    const evaluation = evaluateResponse(
+      learnerInput,
+      inputMode,
+      option,
+    );
 
-      if (inputMode !== "scripted" && conversationEnhancementAvailable && !resolvedOption) {
-        const plannedAdvance = option
-          ? resolveDialogueAdvance(pack, currentBeat, option)
-          : null;
-        const plannedLine = plannedAdvance?.kind === "next_beat"
+    if (!evaluation) {
+      throw new Error("Evaluation could not start.");
+    }
+
+    let resolvedOption = option;
+
+    if (
+      inputMode !== "scripted" &&
+      conversationEnhancementAvailable
+    ) {
+      const plannedAdvance = resolvedOption
+        ? resolveDialogueAdvance(
+            pack,
+            currentBeat,
+            resolvedOption,
+          )
+        : null;
+
+      const plannedLine =
+        plannedAdvance?.kind === "next_beat"
           ? plannedAdvance.beat.characterLine
           : null;
-        const result = await requestConversationEnhancement({
+
+      const result = await requestConversationEnhancement(
+        {
           operationId: operation.id,
           scenarioId: scenario.id,
           beatId: currentBeat.id,
@@ -466,94 +489,124 @@ export function ImmersiveScenario({
           characterName: character.displayName.en,
           characterRole: `${character.relationship}; ${character.personality}`,
           destinationName: destination.name.en,
-          learnerStartingPoint: profile.startingPoint?.kind ?? "beginner",
+          learnerStartingPoint:
+            profile.startingPoint?.kind ?? "beginner",
           learnerInput,
-          allowedIntentIds: [...new Set(currentBeat.responseOptions.map(
-            ({ learningConceptId }) => learningConceptId,
-          ))],
-          deterministicNextLineArabic: plannedLine?.arabicText ?? null,
-          deterministicNextLineMeaning: plannedLine?.englishMeaning ?? null,
-        }, operation.signal);
+          allowedIntentIds: [
+            ...new Set(
+              currentBeat.responseOptions.map(
+                ({ learningConceptId }) => learningConceptId,
+              ),
+            ),
+          ],
+          deterministicNextLineArabic:
+            plannedLine?.arabicText ?? null,
+          deterministicNextLineMeaning:
+            plannedLine?.englishMeaning ?? null,
+        },
+        operation.signal,
+      );
 
-        if (!operationGate.isCurrent(operation.id)) return;
-        if (result.ok) {
-          resolvedOption ??= selectSafeGeneratedAdvance(result.value, currentBeat.responseOptions);
-          const canAdvance = Boolean(
-            resolvedOption &&
+      if (!operationGate.isCurrent(operation.id)) return;
+
+      if (result.ok) {
+        resolvedOption ??= selectSafeGeneratedAdvance(
+          result.value,
+          currentBeat.responseOptions,
+        );
+
+        const canAdvance = Boolean(
+          resolvedOption &&
             !result.value.clarificationNeeded &&
             result.value.shouldContinue,
-          );
-          const shouldPresentGeneratedReply = !canAdvance
-            || plannedLine?.validationStatus !== "verified";
+        );
 
-          if (shouldPresentGeneratedReply) {
-            setPendingOption(canAdvance ? resolvedOption : null);
-            setGeneratedLine(generatedDialogueLine(
-              operation.id,
-              scenario.id,
-              character.id,
-              result.value.characterReplyArabic,
-              result.value.characterReplyMeaning,
-              result.value.probableIntent,
-            ));
-            operationGate.finish(operation.id);
-            setPhase("character_speaking");
-            setVisualState("speaking");
-            return;
-          }
-        }
+        setPendingOption(
+          canAdvance ? resolvedOption : null,
+        );
+
+        setGeneratedLine(
+          generatedDialogueLine(
+            operation.id,
+            scenario.id,
+            character.id,
+            result.value.characterReplyArabic,
+            result.value.characterReplyMeaning,
+            result.value.probableIntent,
+          ),
+        );
+
+        operationGate.finish(operation.id);
+        setPhase("character_speaking");
+        setVisualState("speaking");
+        return;
       }
+    }
 
-      if (inputMode !== "scripted" && !resolvedOption) {
-        presentDeterministicClarification();
+    if (
+      inputMode !== "scripted" &&
+      !resolvedOption
+    ) {
+      presentDeterministicClarification();
+      return;
+    }
+
+    const needsGuide = shouldShowGuideForTurn(
+      evaluation,
+      resolvedOption,
+    );
+
+    setPendingOption(resolvedOption);
+
+    timerRef.current = setTimeout(() => {
+      if (!operationGate.isCurrent(operation.id)) return;
+
+      operationGate.finish(operation.id);
+
+      setVisualState(
+        evaluation.understood
+          ? "positive_reaction"
+          : "clarification_reaction",
+      );
+
+      timerRef.current = null;
+
+      if (needsGuide || !resolvedOption) {
+        setActiveEvaluation(evaluation);
+        setPhase("feedback");
         return;
       }
 
-      const needsGuide = shouldShowGuideForTurn(evaluation, resolvedOption);
-      setPendingOption(resolvedOption);
+      advanceWithOption(resolvedOption);
+    }, reduceMotion ? 40 : 240);
+  } catch {
+    if (!operationGate.isCurrent(operation.id)) return;
 
-      timerRef.current = setTimeout(() => {
-        if (!operationGate.isCurrent(operation.id)) return;
-        operationGate.finish(operation.id);
-        setVisualState(
-          evaluation.understood ? "positive_reaction" : "clarification_reaction",
-        );
-        timerRef.current = null;
+    setActiveEvaluation(null);
 
-        if (needsGuide || !resolvedOption) {
-          setActiveEvaluation(evaluation);
-          setPhase("feedback");
-          return;
-        }
-
-        advanceWithOption(resolvedOption);
-      }, reduceMotion ? 40 : 240);
-    } catch {
-      if (!operationGate.isCurrent(operation.id)) return;
-      setActiveEvaluation(null);
-      if (inputMode !== "scripted") {
-        presentDeterministicClarification();
-      } else {
-        operationGate.finish(operation.id);
-        setPhase("ready");
-        setVisualState("listening");
-      }
+    if (inputMode !== "scripted") {
+      presentDeterministicClarification();
+    } else {
+      operationGate.finish(operation.id);
+      setPhase("ready");
+      setVisualState("listening");
     }
-  }, [
-    advanceWithOption,
-    character,
-    clearPendingTimer,
-    conversationEnhancementAvailable,
-    currentBeat,
-    destination,
-    evaluateResponse,
-    pack,
-    phase,
-    profile,
-    reduceMotion,
-    scenario.id,
-    operationGate,
-  ]);
+  }
+}, [
+  advanceWithOption,
+  character,
+  clearPendingTimer,
+  conversationEnhancementAvailable,
+  currentBeat,
+  destination,
+  evaluateResponse,
+  pack,
+  phase,
+  profile,
+  reduceMotion,
+  scenario.id,
+  operationGate,
+]);
 
   function submitOption(option: LearnerResponseOption) {
     void submitResponse(option.arabicText, "scripted", option);
