@@ -66,18 +66,34 @@ describe("world marker interaction", () => {
 
   it("wires exact selection into both providers and exposes selected identity", () => {
     const fallback = readFileSync("src/features/travel/map/fallback-map-surface.tsx", "utf8");
+    const geographicMap = readFileSync("src/features/travel/map/geographic-map.tsx", "utf8");
     const mapLibre = readFileSync("src/features/travel/map/maplibre-map-surface.tsx", "utf8");
     const world = readFileSync("src/features/travel/components/world-experience.tsx", "utf8");
     const styles = readFileSync("src/app/globals.css", "utf8");
 
     expect(fallback).toContain("resolveNearestMarkerId");
-    expect(mapLibre).toContain("resolveNearestMarkerId");
-    expect(mapLibre).not.toContain("event.features?.[0]");
-    expect(mapLibre).toContain("hoverLabelLayerId");
+    expect(mapLibre).toContain('new maplibregl.Marker({ element: marker.button, anchor: "center" })');
+    expect(mapLibre).toContain("resolveNonOverlappingHitDiameters");
+    expect(mapLibre).toContain('marker.button.classList.add("world-map-node")');
     expect(styles).toContain(".world-map-node:hover .geo-node-label");
     expect(styles).toContain(".world-map-node:focus-visible .geo-node-label");
+    expect(styles).toContain(".vector-geo-node.world-map-node:hover .vector-geo-node-copy");
+    expect(geographicMap).toContain('data-map-level={props.level}');
+    expect(styles).toContain('.map-provider-stack[data-map-level="city"] .maplibregl-ctrl-bottom-right');
+    expect(styles).toMatch(/\.vector-geo-node-copy \{[\s\S]*?min-height: 2\.25rem;/);
+    expect(styles).toMatch(/\.vector-geo-node-copy > span \{[\s\S]*?unicode-bidi: isolate;/);
     expect(world).toContain('aria-labelledby="selected-destination-title"');
     expect(world).toContain('id="selected-destination-title"');
+  });
+
+  it("limits expensive development diagnostics and reuses projected world points", () => {
+    const mapLibre = readFileSync("src/features/travel/map/maplibre-map-surface.tsx", "utf8");
+
+    expect(mapLibre).toContain("let diagnosticsCaptured = false");
+    expect(mapLibre).toContain('if (process.env.NODE_ENV !== "development" || diagnosticsCaptured) return');
+    expect(mapLibre).toContain("diagnosticsCaptured = true");
+    expect(mapLibre).toContain("const projectedMarkers = markerRecords.map");
+    expect(mapLibre).toContain('if (button.dataset.labelVisible !== labelVisible)');
   });
 
   it("preserves active, preview, and future city states in the interaction registry", () => {

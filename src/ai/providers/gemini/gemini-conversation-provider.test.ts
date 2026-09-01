@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { createGeminiConversationProvider, geminiConversationModel } from "@/ai/providers/gemini/gemini-conversation-provider";
+import {
+  createGeminiConversationProvider,
+  geminiConversationModel,
+  geminiProviderTimeoutMs,
+} from "@/ai/providers/gemini/gemini-conversation-provider";
 import type { ConversationTurnRequest } from "@/ai/ports/conversation-provider";
 
 const request: ConversationTurnRequest = {
@@ -52,7 +56,10 @@ describe("Gemini conversation provider", () => {
     expect(result).toMatchObject({ ok: true, availability: "AVAILABLE" });
     expect(client.interactions.create).toHaveBeenCalledWith(
       expect.objectContaining({ model: geminiConversationModel, store: false }),
-      expect.objectContaining({ retries: { strategy: "none" } }),
+      expect.objectContaining({
+        retries: { strategy: "none" },
+        timeout_ms: geminiProviderTimeoutMs,
+      }),
     );
   });
 

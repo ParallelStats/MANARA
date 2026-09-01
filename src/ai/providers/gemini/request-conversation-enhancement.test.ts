@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { ConversationTurnRequest } from "@/ai/ports/conversation-provider";
+import {
+  conversationEnhancementTimeoutMs,
+  geminiProviderTimeoutMs,
+} from "@/ai/providers/gemini/conversation-timeouts";
 import { requestConversationEnhancement } from "@/ai/providers/gemini/request-conversation-enhancement";
 
 const request: ConversationTurnRequest = {
@@ -28,6 +32,10 @@ function hangingFetch(): typeof fetch {
 }
 
 describe("optional conversation enhancement request", () => {
+  it("leaves enough client time for the bounded server request to finish", () => {
+    expect(conversationEnhancementTimeoutMs).toBeGreaterThan(geminiProviderTimeoutMs);
+  });
+
   it("times out instead of blocking deterministic progression", async () => {
     const result = await requestConversationEnhancement(
       request,

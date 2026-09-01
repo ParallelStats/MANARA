@@ -48,29 +48,47 @@ export function createBrowserSpeechRecognition(
 ): SpeechRecognitionPort {
   let activeRecognition: BrowserRecognitionLike | null = null;
   let settleActive: ((result: SpeechRecognitionResult) => void) | null = null;
-  const available = Boolean(factory());
+  let stopActive: (() => void) | null = null;
+  let preparedRecognition: BrowserRecognitionLike | undefined;
+  try {
+    preparedRecognition = factory();
+  } catch {
+    preparedRecognition = undefined;
+  }
+  const available = Boolean(preparedRecognition);
 
   return {
     available,
     async listen(request: SpeechRecognitionRequest) {
       if (activeRecognition) return { ok: false, failure: "recognition_failed" };
-      const recognition = factory();
+      let recognition = preparedRecognition;
+      preparedRecognition = undefined;
+      if (!recognition) {
+        try {
+          recognition = factory();
+        } catch {
+          recognition = undefined;
+        }
+      }
       if (!recognition) return { ok: false, failure: "unavailable" };
       const active = recognition;
 
       return new Promise<SpeechRecognitionResult>((resolve) => {
         let finalTranscript = "";
         let settled = false;
+        let stopGraceTimer: ReturnType<typeof setTimeout> | null = null;
         const timeout = setTimeout(() => finish({ ok: false, failure: "timeout" }), request.timeoutMs);
 
         function cleanup() {
           clearTimeout(timeout);
+          if (stopGraceTimer) clearTimeout(stopGraceTimer);
           request.signal?.removeEventListener("abort", cancel);
           active.onresult = null;
           active.onerror = null;
           active.onend = null;
           activeRecognition = null;
           settleActive = null;
+          stopActive = null;
         }
 
         function finish(result: SpeechRecognitionResult) {
@@ -87,6 +105,21 @@ export function createBrowserSpeechRecognition(
 
         activeRecognition = active;
         settleActive = finish;
+        stopActive = () => {
+          try {
+            active.stop();
+          } catch {
+            finish({ ok: false, failure: "recognition_failed" });
+            return;
+          }
+          if (finalTranscript) {
+            finish({ ok: true, transcript: finalTranscript });
+            return;
+          }
+          stopGraceTimer = setTimeout(() => finish(
+            { ok: false, failure: "silence" },
+          ), 180);
+        };
         active.lang = request.language;
         active.continuous = false;
         active.interimResults = true;
@@ -119,11 +152,7 @@ export function createBrowserSpeechRecognition(
     },
     stop() {
       if (!activeRecognition) return;
-      try {
-        activeRecognition.stop();
-      } catch {
-        settleActive?.({ ok: false, failure: "recognition_failed" });
-      }
+      stopActive?.();
     },
     cancel() {
       if (!activeRecognition) return;

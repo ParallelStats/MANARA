@@ -36,14 +36,16 @@ interface Box {
 
 const anchors: readonly MapLabelAnchor[] = ["top", "right", "bottom", "left"];
 
-function preferredAnchors(candidate: MapLabelCandidate, width: number) {
+function preferredAnchors(candidate: MapLabelCandidate, width: number, height: number) {
   if (candidate.x < width * 0.24) return ["right", "bottom", "top", "left"] as const;
   if (candidate.x > width * 0.76) return ["left", "bottom", "top", "right"] as const;
+  if (candidate.y < height * 0.22) return ["bottom", "right", "left", "top"] as const;
+  if (candidate.y > height * 0.78) return ["top", "right", "left", "bottom"] as const;
   return anchors;
 }
 
 function labelBox(candidate: MapLabelCandidate, anchor: MapLabelAnchor): Box {
-  const width = Math.min(156, Math.max(72, 42 + candidate.labelLength * 4.8));
+  const width = Math.min(176, Math.max(72, 42 + candidate.labelLength * 5));
   const height = candidate.selected ? 43 : 38;
   const gap = candidate.selected ? 19 : 17;
 
@@ -98,6 +100,15 @@ function fits(box: Box, area: CollisionArea) {
   return box.left >= left && box.right <= right && box.top >= top && box.bottom <= bottom;
 }
 
+function overflowAmount(box: Box, area: CollisionArea) {
+  const top = area.insets?.top ?? 12;
+  const right = area.width - (area.insets?.right ?? 12);
+  const bottom = area.height - (area.insets?.bottom ?? 12);
+  const left = area.insets?.left ?? 12;
+  return Math.max(0, left - box.left) + Math.max(0, box.right - right)
+    + Math.max(0, top - box.top) + Math.max(0, box.bottom - bottom);
+}
+
 export function resolveMapLabelPlacements(
   candidates: readonly MapLabelCandidate[],
   area: CollisionArea,
@@ -120,7 +131,8 @@ export function resolveMapLabelPlacements(
     }
 
     let placement: MapLabelPlacement | undefined;
-    for (const anchor of preferredAnchors(candidate, area.width)) {
+    const candidateAnchors = preferredAnchors(candidate, area.width, area.height);
+    for (const anchor of candidateAnchors) {
       const box = labelBox(candidate, anchor);
       if (!fits(box, area) || accepted.some((acceptedBox) => overlaps(box, acceptedBox))) continue;
 
@@ -128,6 +140,16 @@ export function resolveMapLabelPlacements(
       visibleCount += 1;
       placement = { id: candidate.id, anchor, visible: true };
       break;
+    }
+
+    if (!placement && candidate.selected) {
+      const anchor = [...candidateAnchors].sort(
+        (first, second) => overflowAmount(labelBox(candidate, first), area)
+          - overflowAmount(labelBox(candidate, second), area),
+      )[0] ?? "top";
+      accepted.push(labelBox(candidate, anchor));
+      visibleCount += 1;
+      placement = { id: candidate.id, anchor, visible: true };
     }
 
     placements.set(candidate.id, placement ?? { id: candidate.id, anchor: "top", visible: false });

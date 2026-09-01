@@ -85,7 +85,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
-      <body id="top">
+      <body id="top" suppressHydrationWarning>
         <UiPreferencesProvider>
           <AppShell>{children}</AppShell>
         </UiPreferencesProvider>

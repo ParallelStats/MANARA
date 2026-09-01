@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getWorldNodePresentationPriority } from "@/application/travel/select-world-network-nodes";
 import type { GeographicPoint } from "@/domain/travel/types";
 import { useUiPreferences } from "@/features/preferences/ui-preferences-provider";
+import { HotspotLandmarkIcon } from "@/features/travel/map/hotspot-landmark";
 import { resolveMapLabelPlacements, type MapLabelPlacement } from "@/features/travel/map/label-collision";
 import {
   projectFallbackWorldPoint,
@@ -22,10 +23,11 @@ interface FallbackMapSurfaceProps extends MapSurfaceProps {
 }
 
 function pointStyle(inline: number, block: number, hitDiameter?: number) {
+  const cssNumber = (value: number) => value.toFixed(3).replace(/\.?0+$/, "");
   return {
-    "--node-inline": `${inline}%`,
-    "--node-block": `${block}%`,
-    ...(hitDiameter !== undefined ? { "--marker-hit-size": `${hitDiameter}px` } : {}),
+    "--node-inline": `${cssNumber(inline)}%`,
+    "--node-block": `${cssNumber(block)}%`,
+    ...(hitDiameter !== undefined ? { "--marker-hit-size": `${cssNumber(hitDiameter)}px` } : {}),
   } as CSSProperties;
 }
 
@@ -178,6 +180,7 @@ export function FallbackMapSurface({
           <div className="fallback-land fallback-land-africa" aria-hidden="true" />
           <div className="fallback-land fallback-land-arabia" aria-hidden="true" />
           <div className="fallback-land fallback-land-levant" aria-hidden="true" />
+          <div className="arab-country-boundaries" aria-hidden="true" />
 
           {showRouteArc && activeTravelRoute ? (
             <svg className="fallback-route" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
@@ -240,11 +243,15 @@ export function FallbackMapSurface({
                   type="button"
                   className={`geo-node hotspot-node focus-ring is-${hotspot.availability}${placementClass(placement)}${selected ? " is-selected" : ""}`}
                   style={pointStyle(hotspot.fallbackPosition.inline, hotspot.fallbackPosition.block)}
+                  data-hotspot-kind={hotspot.kind}
                   data-label-visible={placement?.visible ?? false}
                   aria-label={t(statusKey, { name: hotspot.name[locale] })}
                   aria-pressed={selected}
                   onClick={() => onHotspotSelect(hotspot.id)}
                 >
+                  <span className="hotspot-landmark" aria-hidden="true">
+                    <HotspotLandmarkIcon kind={hotspot.kind} />
+                  </span>
                   <span className="geo-node-pulse" aria-hidden="true" />
                   <span className="geo-node-label" lang={locale} dir={locale === "ar" ? "rtl" : "ltr"}>
                     {hotspot.name[locale]}

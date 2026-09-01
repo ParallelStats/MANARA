@@ -1,6 +1,7 @@
 export interface SpeechPlaybackRequest {
   readonly text: string;
   readonly language: string;
+  readonly preferredGender?: "female" | "male";
   readonly recordedAudioUrl?: string;
   readonly signal?: AbortSignal;
 }

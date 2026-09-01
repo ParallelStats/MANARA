@@ -24,9 +24,13 @@ describe("scenario interaction dock", () => {
     expect(voiceDock).toContain('aria-pressed={voiceState === "listening"}');
     expect(voiceDock).toContain('disabled={busy || voiceState === "processing"}');
     expect(voiceDock).toContain("recognition.stop()");
+    expect(voiceDock).toContain("mountedRef.current = true");
+    expect(voiceDock).toContain("stopRecoveryTimerRef.current = setTimeout");
+    expect(voiceDock).toContain("recognition.cancel(), 1_000");
     expect(voiceDock).toContain('role="status" aria-live="polite"');
     expect(voiceDock).toContain("aria-expanded={choicesOpen}");
     expect(voiceDock).toContain("aria-expanded={textOpen}");
+    expect(voiceDock).not.toContain("setTextOpen(true)");
   });
 
   it("serves all four active scenarios through the shared responsive dock", () => {

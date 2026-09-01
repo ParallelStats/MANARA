@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 import type { MapConfiguration } from "@/config/map";
 import { FallbackMapSurface } from "@/features/travel/map/fallback-map-surface";
@@ -20,14 +20,8 @@ export function GeographicMap(props: GeographicMapProps) {
   const { activeTravelRoute, configuration, onTravelComplete } = props;
   const [mapLibreReady, setMapLibreReady] = useState(false);
   const [providerFailed, setProviderFailed] = useState(false);
-  const activeTravelRouteRef = useRef(activeTravelRoute);
-
-  useLayoutEffect(() => {
-    activeTravelRouteRef.current = activeTravelRoute;
-  }, [activeTravelRoute]);
 
   const handleMapLibreReady = useCallback(() => {
-    if (activeTravelRouteRef.current) return;
     setMapLibreReady(true);
   }, []);
   const handleMapLibreError = useCallback(() => setProviderFailed(true), []);
@@ -42,7 +36,7 @@ export function GeographicMap(props: GeographicMapProps) {
   const showMapLibre = mapLibreReady;
 
   return (
-    <div className="map-provider-stack">
+    <div className="map-provider-stack" data-map-level={props.level}>
       {!showMapLibre ? (
         <FallbackMapSurface
           {...props}

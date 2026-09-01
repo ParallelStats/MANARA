@@ -60,6 +60,8 @@ export function VoiceDock({
     () => suppliedRecognition ?? createBrowserSpeechRecognition(),
   );
   const mountedRef = useRef(true);
+  const stopRecoveryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopRequestedRef = useRef(false);
   const [choicesOpen, setChoicesOpen] = useState(false);
   const [textOpen, setTextOpen] = useState(false);
   const [text, setText] = useState("");
@@ -72,9 +74,13 @@ export function VoiceDock({
   );
   const sheetOpen = choicesOpen || textOpen;
 
-  useEffect(() => () => {
-    mountedRef.current = false;
-    recognition.cancel();
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (stopRecoveryTimerRef.current) clearTimeout(stopRecoveryTimerRef.current);
+      recognition.cancel();
+    };
   }, [recognition]);
 
   function setVoice(next: VoiceState) {
@@ -169,16 +175,19 @@ export function VoiceDock({
     if (voiceState === "listening") {
       setStatusKey("voice.status.processing");
       setVoice("processing");
+      stopRequestedRef.current = true;
       recognition.stop();
+      if (stopRecoveryTimerRef.current) clearTimeout(stopRecoveryTimerRef.current);
+      stopRecoveryTimerRef.current = setTimeout(() => recognition.cancel(), 1_000);
       return;
     }
     if (busy || voiceState !== "ready") return;
     closeSheets();
     setTranscript("");
+    stopRequestedRef.current = false;
 
     if (!recognition.available) {
       setStatusKey("voice.status.unavailableBrowser");
-      setTextOpen(true);
       return;
     }
 
@@ -189,16 +198,22 @@ export function VoiceDock({
       timeoutMs: 12_000,
       onInterimTranscript: setTranscript,
     });
+    if (stopRecoveryTimerRef.current) {
+      clearTimeout(stopRecoveryTimerRef.current);
+      stopRecoveryTimerRef.current = null;
+    }
     if (!mountedRef.current) return;
     if (!result.ok) {
+      const stoppedByLearner = stopRequestedRef.current;
+      stopRequestedRef.current = false;
       setVoice("ready");
-      setStatusKey(failureMessageKey(result.failure));
-      if (result.failure === "permission_denied" || result.failure === "unavailable") {
-        setTextOpen(true);
-      }
+      setStatusKey(failureMessageKey(
+        stoppedByLearner && result.failure === "cancelled" ? "silence" : result.failure,
+      ));
       return;
     }
 
+    stopRequestedRef.current = false;
     setTranscript(result.transcript);
     setStatusKey("voice.status.processing");
     setVoice("processing");

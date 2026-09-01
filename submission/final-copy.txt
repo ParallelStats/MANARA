@@ -9,7 +9,7 @@ TRAVEL THE ARAB WORLD THROUGH ITS ARABIC.
 YOUR ARABIC DOESN'T RESTART AT THE BORDER.
 IT EVOLVES.
 
-Arabic learners often discover that knowing Arabic is not the same as knowing what feels natural in a particular place. MANARA turns the Arab world into an immersive learning journey, helping each learner adapt the Arabic they already know - even if that is none - to real people, situations and everyday speech.
+Arabic learners often discover that knowing Arabic is not the same as knowing what feels natural in a particular place. MANARA turns the Arab world into an immersive learning journey, helping each learner adapt the Arabic they already know - or begin from zero - through real people, situations and everyday speech.
 
 THE ARAB WORLD
 39 CITY NODES
@@ -57,7 +57,7 @@ Illustrative prototype interaction
 Choose Abu Dhabi. Enter a café with a clear social goal.
 
 02 - SPEAK
-Hear Arabic, then answer by voice, text or a safe practice choice.
+Hear Arabic, then answer by voice, text or guided support.
 
 03 - ADAPT
 If meaning is clear, the Local Guide may offer one more locally useful option.
@@ -91,9 +91,25 @@ YOUR FUMBLE MAP
 MANARA IS LEARNING
 HOW YOU LEARN.
 
-Your Fumble Map turns completed conversations into a small, useful picture of communication strengths, successful retries, local adaptation and concepts worth revisiting. It is not a grade. It is a record of movement.
+Not a grade. A record of movement.
 
-Direct prototype screen
+CAIRO → ABU DHABI
+
+COMMUNICATING WELL
+Café ordering
+
+ADAPTING LOCALLY
+Request forms in Abu Dhabi
+
+SUCCESSFUL RETRY
+Used a local alternative successfully
+
+TO REVISIT
+Direction vocabulary
+
+Completed conversations become useful signals: what communicates, what adapts, what worked on retry and what deserves another moment.
+
+Enhanced prototype visualization
 
 SCALABLE
 THE ARAB WORLD AS A LEARNING NETWORK
@@ -126,5 +142,8 @@ MANARA moves Arabic beyond classroom abstraction. Place, culture and social cont
 
 LEARN ARABIC NOT AS ONE DESTINATION,
 BUT AS A WORLD YOU CAN MOVE THROUGH.
+
+EXPLORE THE INTERACTIVE PROTOTYPE
+Scan to experience MANARA
 
 03 / 03

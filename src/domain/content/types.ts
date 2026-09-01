@@ -62,6 +62,10 @@ export interface Character extends ReviewMetadata {
   readonly ageContext: string;
   readonly relationship: string;
   readonly personality: string;
+  readonly voiceProfile: Readonly<{
+    locale: "ar-AE" | "ar-EG";
+    preferredGender: "female" | "male";
+  }>;
   readonly visualAssetPath: string;
   readonly visualId: string;
 }

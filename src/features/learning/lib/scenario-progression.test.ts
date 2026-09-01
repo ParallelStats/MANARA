@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { getDialoguePackByScenarioId } from "@/content/dialogue-packs";
 import {
   getDialogueBeat,
+  resolveDeterministicResponseOption,
   resolveDialogueAdvance,
   shouldShowGuideForTurn,
 } from "@/features/learning/lib/scenario-progression";
@@ -65,6 +66,22 @@ describe("scenario progression", () => {
 
   it("redirects an unmatched or off-topic response instead of silently advancing", () => {
     expect(shouldShowGuideForTurn(unclassifiedEvaluation(), null)).toBe(true);
+  });
+
+  it("matches a unique on-topic shortened response without requiring Gemini", () => {
+    const pack = getDialoguePackByScenarioId("scenario-abu-dhabi-cafe")!;
+    const beat = getDialogueBeat(pack, pack.startingBeatId)!;
+
+    expect(resolveDeterministicResponseOption("أبغي قهوة", beat.responseOptions)?.id)
+      .toBe("response-adc-01-target");
+  });
+
+  it("does not guess when a response is unrelated or matches several options", () => {
+    const pack = getDialoguePackByScenarioId("scenario-abu-dhabi-cafe")!;
+    const beat = getDialogueBeat(pack, pack.startingBeatId)!;
+
+    expect(resolveDeterministicResponseOption("كيف حالك؟", beat.responseOptions)).toBeNull();
+    expect(resolveDeterministicResponseOption("قهوة", beat.responseOptions)).toBeNull();
   });
 
   it("does not interrupt an authored on-topic target response in review mode", () => {

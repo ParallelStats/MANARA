@@ -48,4 +48,13 @@ describe("map label collision", () => {
     expect(placements).toHaveLength(candidates.length);
     expect(placements.filter(({ visible }) => visible).length).toBeLessThanOrEqual(5);
   });
+
+  it("keeps the selected Abu Dhabi label visible and anchored inside the Gulf edge", () => {
+    const [placement] = resolveMapLabelPlacements(
+      [{ id: "abu-dhabi", x: 360, y: 190, labelLength: 18, priority: 950, selected: true }],
+      { width: 390, height: 440, maxLabels: 0, insets: { top: 90, right: 20, bottom: 34, left: 20 } },
+    );
+
+    expect(placement).toEqual({ id: "abu-dhabi", anchor: "left", visible: true });
+  });
 });

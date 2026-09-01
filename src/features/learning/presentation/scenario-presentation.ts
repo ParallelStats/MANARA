@@ -55,7 +55,7 @@ export const scenarioScenePresentations = {
     environmentVisualId: "coastal-cafe-evening",
     characterId: "character-abu-dhabi-cafe-mariam",
     characterVisualId: "mariam-cafe",
-    characterAssetPath: "/characters/abu-dhabi-cafe-mariam-refined-v1.webp",
+    characterAssetPath: "/characters/abu-dhabi-cafe-mariam-refined-v3.webp",
     backgroundAssetPath: "/scenes/scenario-abu-dhabi-cafe/background-refined-v1.webp",
     composition: "abu-dhabi-cafe",
     ambientPreset: "cafe_glow",

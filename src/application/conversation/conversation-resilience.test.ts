@@ -110,7 +110,7 @@ describe("Gemini-independent MANARA journey", () => {
       "immersive-scenario.tsx",
     ), "utf8");
     expect(scenario).toContain(
-      'inputMode !== "scripted" && conversationEnhancementAvailable',
+      'inputMode !== "scripted" && conversationEnhancementAvailable && !resolvedOption',
     );
     expect(scenario).toContain("shouldShowGuideForTurn(evaluation, resolvedOption)");
   });
@@ -125,8 +125,8 @@ describe("Gemini-independent MANARA journey", () => {
       "immersive-scenario.tsx",
     ), "utf8");
     expect(scenario).toContain("shouldPresentGeneratedReply");
-    expect(scenario).toContain("presentCurrentPromptAgain");
-    expect(scenario).toContain('id: `repeat-${operation.id}`');
+    expect(scenario).toContain("presentDeterministicClarification");
+    expect(scenario).toContain('id: `clarification-${operationId}`');
   });
 
   it("keeps the permanent Gemini secret out of client modules and public configuration", () => {

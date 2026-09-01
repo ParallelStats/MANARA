@@ -36,8 +36,8 @@ export function createWorldTravelRoute({
     to: targetArrival.cityCamera,
     ...(originDestinationId ? { originDestinationId } : {}),
     targetDestinationId,
-    durationMs: 4200,
-    reducedMotionDurationMs: 420,
+    durationMs: 2600,
+    reducedMotionDurationMs: 260,
     transferContext:
       transferContext?.targetDialectId === targetDialectId
         ? transferContext
@@ -59,8 +59,8 @@ export function createScenarioTravelRoute(
     to: hotspot.camera,
     originDestinationId: hotspot.destinationId,
     targetDestinationId: hotspot.destinationId,
-    durationMs: 2200,
-    reducedMotionDurationMs: 320,
+    durationMs: 1250,
+    reducedMotionDurationMs: 180,
     transferContext: {
       targetDialectId,
       conceptIds: [],

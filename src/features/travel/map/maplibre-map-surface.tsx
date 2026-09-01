@@ -7,8 +7,14 @@ import { createGeographicArc } from "@/application/travel/create-geographic-arc"
 import { getWorldNodePresentationPriority } from "@/application/travel/select-world-network-nodes";
 import type { LocalizedText } from "@/domain/content/types";
 import { useUiPreferences } from "@/features/preferences/ui-preferences-provider";
+import { createHotspotLandmarkElement } from "@/features/travel/map/hotspot-landmark";
 import { resolveMapLabelPlacements } from "@/features/travel/map/label-collision";
-import { resolveNearestMarkerId } from "@/features/travel/map/marker-interaction";
+import { hasRenderableMapBase } from "@/features/travel/map/map-readiness";
+import {
+  resolveNonOverlappingHitDiameters,
+  shouldShowPersistentWorldLabel,
+} from "@/features/travel/map/marker-interaction";
+import type { ScenarioHotspot } from "@/domain/travel/types";
 import type { MapSurfaceProps } from "@/features/travel/map/map-surface-types";
 import type { UiLocale } from "@/i18n/ui-preferences";
 
@@ -18,10 +24,12 @@ interface MapLibreMapSurfaceProps extends MapSurfaceProps {
   readonly onReady: () => void;
 }
 
-const worldSourceId = "manara-world-destinations";
 const routeSourceId = "manara-travel-route";
+const arabCountriesSourceId = "manara-arab-countries";
 
-function applyManaraMapPalette(map: maplibregl.Map) {
+maplibregl.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
+
+function applyManaraMapPalette(map: maplibregl.Map, level: "city" | "world") {
   for (const layer of map.getStyle().layers ?? []) {
     const sourceLayer = (layer as { "source-layer"?: string })["source-layer"];
     const id = layer.id.toLowerCase();
@@ -29,22 +37,27 @@ function applyManaraMapPalette(map: maplibregl.Map) {
     const isProviderPlaceLabel = sourceLayer === "place" && !isCountryLabel;
     const isProviderPoi = sourceLayer === "poi" || /(^|[-_])poi([-_]|$)/i.test(id);
 
-    if (layer.type === "symbol" && (isProviderPlaceLabel || isProviderPoi)) {
+    if (level === "world" && layer.type === "symbol" && (isProviderPlaceLabel || isProviderPoi)) {
       map.setLayoutProperty(layer.id, "visibility", "none");
       continue;
     }
 
+    if (level === "city" && layer.type === "symbol" && isProviderPoi) {
+      map.setLayoutProperty(layer.id, "visibility", "visible");
+      if (layer.id === "poi_r1") map.setLayerZoomRange(layer.id, 13.1, 24);
+    }
+
     if (layer.type === "background") {
-      map.setPaintProperty(layer.id, "background-color", "#102019");
+      map.setPaintProperty(layer.id, "background-color", "#10241c");
       continue;
     }
 
     if (layer.type === "raster") {
-      map.setPaintProperty(layer.id, "raster-opacity", 0.32);
-      map.setPaintProperty(layer.id, "raster-saturation", -0.7);
-      map.setPaintProperty(layer.id, "raster-contrast", 0.18);
-      map.setPaintProperty(layer.id, "raster-brightness-min", 0.04);
-      map.setPaintProperty(layer.id, "raster-brightness-max", 0.36);
+      map.setPaintProperty(layer.id, "raster-opacity", 0.58);
+      map.setPaintProperty(layer.id, "raster-saturation", -0.28);
+      map.setPaintProperty(layer.id, "raster-contrast", 0.1);
+      map.setPaintProperty(layer.id, "raster-brightness-min", 0.08);
+      map.setPaintProperty(layer.id, "raster-brightness-max", 0.58);
       continue;
     }
 
@@ -53,8 +66,11 @@ function applyManaraMapPalette(map: maplibregl.Map) {
         map.setPaintProperty(layer.id, "fill-color", "#123d48");
         map.setPaintProperty(layer.id, "fill-opacity", 0.94);
       } else if (sourceLayer === "building") {
-        map.setPaintProperty(layer.id, "fill-color", "#2c352f");
-        map.setPaintProperty(layer.id, "fill-opacity", 0.82);
+        map.setPaintProperty(layer.id, "fill-color", "#465249");
+        map.setPaintProperty(layer.id, "fill-opacity", 0.88);
+        if (level === "city" && layer.id === "building") {
+          map.setLayerZoomRange(layer.id, 12.8, 14);
+        }
       } else if (id.includes("park") || id.includes("wood") || id.includes("grass")) {
         map.setPaintProperty(layer.id, "fill-color", "#274a36");
         map.setPaintProperty(layer.id, "fill-opacity", 0.76);
@@ -62,8 +78,8 @@ function applyManaraMapPalette(map: maplibregl.Map) {
         map.setPaintProperty(layer.id, "fill-color", "#5d4b32");
         map.setPaintProperty(layer.id, "fill-opacity", 0.72);
       } else if (sourceLayer === "landuse" || sourceLayer === "landcover") {
-        map.setPaintProperty(layer.id, "fill-color", "#20372b");
-        map.setPaintProperty(layer.id, "fill-opacity", 0.56);
+        map.setPaintProperty(layer.id, "fill-color", "#294332");
+        map.setPaintProperty(layer.id, "fill-opacity", 0.7);
       }
       continue;
     }
@@ -74,13 +90,17 @@ function applyManaraMapPalette(map: maplibregl.Map) {
         map.setPaintProperty(layer.id, "line-opacity", id.includes("country") || id.includes("boundary_2") ? 0.82 : 0.4);
       } else if (sourceLayer === "transportation") {
         const majorRoad = /(motorway|trunk|primary|secondary)/.test(id);
-        map.setPaintProperty(layer.id, "line-color", majorRoad ? "#a98d58" : "#655c49");
-        map.setPaintProperty(layer.id, "line-opacity", majorRoad ? 0.82 : 0.58);
+        map.setPaintProperty(layer.id, "line-color", majorRoad ? "#d0aa6c" : "#8e8065");
+        map.setPaintProperty(layer.id, "line-opacity", majorRoad ? 0.9 : 0.68);
       }
       continue;
     }
 
-    if (layer.type === "symbol" && sourceLayer === "place" && isCountryLabel) {
+    if (level === "city" && layer.type === "symbol" && isProviderPoi) {
+      map.setPaintProperty(layer.id, "text-color", "#ead8a4");
+      map.setPaintProperty(layer.id, "text-halo-color", "#07110e");
+      map.setPaintProperty(layer.id, "text-halo-width", 1.35);
+    } else if (layer.type === "symbol" && sourceLayer === "place" && isCountryLabel) {
       map.setPaintProperty(layer.id, "text-color", "#ead8a4");
       map.setPaintProperty(layer.id, "text-halo-color", "#07110e");
       map.setPaintProperty(layer.id, "text-halo-width", 1.4);
@@ -91,8 +111,92 @@ function applyManaraMapPalette(map: maplibregl.Map) {
   }
 }
 
+const arabCountryLayerIds = {
+  fill: `${arabCountriesSourceId}-fill`,
+  glow: `${arabCountriesSourceId}-border-glow`,
+  border: `${arabCountriesSourceId}-border`,
+} as const;
+
+function addArabCountryHighlight(map: maplibregl.Map) {
+  if (!map.getSource(arabCountriesSourceId)) {
+    map.addSource(arabCountriesSourceId, {
+      type: "geojson",
+      data: "/data/arab-country-boundaries.geojson",
+    });
+  }
+  if (!map.getLayer(arabCountryLayerIds.fill)) {
+    map.addLayer({
+      id: arabCountryLayerIds.fill,
+      type: "fill",
+      source: arabCountriesSourceId,
+      paint: {
+        "fill-color": [
+          "match",
+          ["get", "code"],
+          ["ARE", "EGY"], "#23845a",
+          ["MAR"], "#8a6935",
+          "#2d684f",
+        ],
+        "fill-opacity": 0.44,
+      },
+    });
+  }
+  if (!map.getLayer(arabCountryLayerIds.glow)) {
+    map.addLayer({
+      id: arabCountryLayerIds.glow,
+      type: "line",
+      source: arabCountriesSourceId,
+      paint: {
+        "line-color": "#f5d98d",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 2, 3.5, 6, 6],
+        "line-opacity": 0.26,
+        "line-blur": 3,
+      },
+    });
+  }
+  if (!map.getLayer(arabCountryLayerIds.border)) {
+    map.addLayer({
+      id: arabCountryLayerIds.border,
+      type: "line",
+      source: arabCountriesSourceId,
+      paint: {
+        "line-color": "#f8dda0",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 2, 1.25, 6, 2.25],
+        "line-opacity": 0.98,
+      },
+    });
+  }
+}
+
+function raiseManaraLayers(map: maplibregl.Map) {
+  const orderedIds = [
+    arabCountryLayerIds.fill,
+    `${routeSourceId}-glow`,
+    `${routeSourceId}-line`,
+    arabCountryLayerIds.glow,
+    arabCountryLayerIds.border,
+  ];
+  for (const id of orderedIds) {
+    if (map.getLayer(id)) map.moveLayer(id);
+  }
+}
+
 function asLngLat(point: readonly [number, number]): [number, number] {
   return [point[0], point[1]];
+}
+
+function fitWorldNetworkBounds(map: maplibregl.Map, container: HTMLElement) {
+  map.fitBounds(
+    [[-12, 10], [63, 39]],
+    {
+      padding: container.clientWidth < 700
+        ? { top: 76, right: 28, bottom: Math.min(270, container.clientHeight * 0.4), left: 28 }
+        : { top: 64, right: 54, bottom: 64, left: 54 },
+      duration: 0,
+      pitch: 0,
+      bearing: 0,
+    },
+  );
 }
 
 function createMarkerButton(
@@ -102,12 +206,18 @@ function createMarkerButton(
   locale: UiLocale,
   ariaLabel: string,
   onSelect: () => void,
+  hotspotKind?: ScenarioHotspot["kind"],
 ) {
   const button = document.createElement("button");
   button.type = "button";
   button.className = `vector-geo-node is-${status}${selected ? " is-selected" : ""}`;
   button.setAttribute("aria-label", ariaLabel);
   button.setAttribute("aria-pressed", String(selected));
+
+  if (hotspotKind) {
+    button.dataset.hotspotKind = hotspotKind;
+    button.append(createHotspotLandmarkElement(hotspotKind));
+  }
 
   const pulse = document.createElement("span");
   pulse.className = "vector-geo-node-pulse";
@@ -173,6 +283,7 @@ export function MapLibreMapSurface({
     let disposed = false;
     let providerReady = false;
     let stylePrepared = false;
+    let diagnosticsCaptured = false;
     let map: maplibregl.Map;
     try {
       const testCanvas = document.createElement("canvas");
@@ -203,10 +314,38 @@ export function MapLibreMapSurface({
 
     const loadingTimeout = window.setTimeout(() => {
       if (!providerReady && !disposed) onProviderError();
-    }, 12_000);
+    }, 10_000);
+
+    const hasReadableBaseMap = () => {
+      const sources = Object.values(map.getStyle().sources ?? {});
+      return hasRenderableMapBase(level, {
+        styleLoaded: stylePrepared,
+        hasRasterSource: sources.some(({ type }) => type === "raster"),
+        hasVectorSource: sources.some(({ type }) => type === "vector"),
+      });
+    };
+
+    const updateDevelopmentDiagnostics = () => {
+      if (process.env.NODE_ENV !== "development" || diagnosticsCaptured) return;
+      let vectorFeatureCount = 0;
+      try {
+        vectorFeatureCount = ["transportation", "building", "landuse", "water", "poi"]
+          .reduce((total, sourceLayer) => total + map.querySourceFeatures(
+            "openmaptiles",
+            { sourceLayer },
+          ).length, 0);
+      } catch {
+        vectorFeatureCount = 0;
+      }
+      container.dataset.mapTilesLoaded = String(map.areTilesLoaded());
+      container.dataset.mapVectorFeatures = String(vectorFeatureCount);
+      container.dataset.mapRenderedFeatures = String(map.queryRenderedFeatures().length);
+      container.dataset.mapZoom = map.getZoom().toFixed(2);
+      diagnosticsCaptured = true;
+    };
 
     const markProviderReady = () => {
-      if (disposed || providerReady || !stylePrepared) return;
+      if (disposed || providerReady || !stylePrepared || !hasReadableBaseMap()) return;
       providerReady = true;
       window.clearTimeout(loadingTimeout);
       readyMapRef.current = map;
@@ -214,24 +353,19 @@ export function MapLibreMapSurface({
       onReady();
     };
 
+    const fitWorldBounds = () => {
+      fitWorldNetworkBounds(map, container);
+    };
+
     const handleStyleLoad = () => {
       if (disposed) return;
       try {
         map.setProjection({ type: "mercator" });
-        applyManaraMapPalette(map);
+        applyManaraMapPalette(map, level);
 
         if (level === "world") {
-          map.fitBounds(
-            [[-12, 10], [63, 39]],
-            {
-              padding: container.clientWidth < 700
-                ? { top: 76, right: 28, bottom: Math.min(270, container.clientHeight * 0.4), left: 28 }
-                : { top: 64, right: 54, bottom: 64, left: 54 },
-              duration: 0,
-              pitch: 0,
-              bearing: 0,
-            },
-          );
+          fitWorldBounds();
+          addArabCountryHighlight(map);
         } else if (container.clientWidth < 520 && hotspots.length > 1) {
           const longitudes = hotspots.map((hotspot) => hotspot.coordinates[0]);
           const latitudes = hotspots.map((hotspot) => hotspot.coordinates[1]);
@@ -286,39 +420,74 @@ export function MapLibreMapSurface({
           },
         });
 
+        if (level === "world") raiseManaraLayers(map);
+
         stylePrepared = true;
-        if (map.areTilesLoaded()) markProviderReady();
+        markProviderReady();
       } catch {
         onProviderError();
       }
     };
 
     const handleSourceData = (event: maplibregl.MapSourceDataEvent) => {
-      if (event.sourceId === "openmaptiles" && event.isSourceLoaded) markProviderReady();
+      if (event.sourceId === arabCountriesSourceId && level === "world") {
+        raiseManaraLayers(map);
+      }
+      if (event.sourceId === "openmaptiles") markProviderReady();
     };
 
-    const handleIdle = () => markProviderReady();
+    const handleMissingStyleImage = (event: { id: string }) => {
+      if (map.hasImage(event.id)) return;
+      map.addImage(event.id, {
+        width: 1,
+        height: 1,
+        data: new Uint8Array([0, 0, 0, 0]),
+      });
+    };
+
+    const handleIdle = () => {
+      updateDevelopmentDiagnostics();
+      markProviderReady();
+    };
 
     const handleError = (event: maplibregl.ErrorEvent) => {
       const message = event.error?.message?.toLowerCase() ?? "";
-      if (!providerReady || message.includes("style") || message.includes("webgl") || message.includes("network") || message.includes("fetch")) {
+      if (process.env.NODE_ENV === "development") {
+        container.dataset.mapError = message.slice(0, 240);
+      }
+      const fatalRendererError = message.includes("webgl") || message.includes("context lost");
+      const fatalStyleError = !stylePrepared && (
+        message.includes("style") || message.includes("network") || message.includes("fetch")
+      );
+      if (fatalRendererError || fatalStyleError) {
         onProviderError();
       }
     };
 
     map.on("style.load", handleStyleLoad);
+    map.on("styleimagemissing", handleMissingStyleImage);
     map.on("sourcedata", handleSourceData);
     map.on("idle", handleIdle);
     map.on("error", handleError);
 
-    const resizeObserver = new ResizeObserver(() => map.resize());
+    let resizeFrame: number | null = null;
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize();
+      if (level !== "world" || resizeFrame !== null) return;
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null;
+        fitWorldBounds();
+      });
+    });
     resizeObserver.observe(container);
 
     return () => {
       disposed = true;
       window.clearTimeout(loadingTimeout);
+      if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
       resizeObserver.disconnect();
       map.off("style.load", handleStyleLoad);
+      map.off("styleimagemissing", handleMissingStyleImage);
       map.off("sourcedata", handleSourceData);
       map.off("idle", handleIdle);
       map.off("error", handleError);
@@ -344,164 +513,118 @@ export function MapLibreMapSurface({
     const map = readyMapRef.current;
     if (!map || map !== mapRef.current || level !== "world") return;
 
-    const data = {
-      type: "FeatureCollection" as const,
-      features: worldNodes.map((node) => ({
-        type: "Feature" as const,
-        properties: {
-          id: node.id,
-          title: node.name[locale],
-          availability: node.availability,
-          selected: node.id === selectedDestinationId,
-          sortKey: 2_000 - getWorldNodePresentationPriority(node, selectedDestinationId),
-        },
-        geometry: { type: "Point" as const, coordinates: [...node.coordinates] },
-      })),
-    };
+    map.resize();
+    fitWorldNetworkBounds(map, map.getContainer());
 
-    const hitLayerId = `${worldSourceId}-hits`;
-    const circleLayerId = `${worldSourceId}-circles`;
-    const labelLayerId = `${worldSourceId}-labels`;
-    const hoverLabelLayerId = `${worldSourceId}-hover-label`;
-    const selectedLabelLayerId = `${worldSourceId}-selected-label`;
+    const markers: maplibregl.Marker[] = [];
+    const disposers: Array<() => void> = [];
+    const markerRecords: Array<{
+      button: HTMLButtonElement;
+      node: (typeof worldNodes)[number];
+    }> = [];
 
-    try {
-      const source = map.getSource(worldSourceId) as maplibregl.GeoJSONSource | undefined;
-      if (source) {
-        source.setData(data);
-      } else if (worldNodes.length > 0) {
-        map.addSource(worldSourceId, { type: "geojson", data });
-        map.addLayer({
-          id: hitLayerId,
-          type: "circle",
-          source: worldSourceId,
-          paint: { "circle-radius": 11, "circle-opacity": 0.01 },
-        });
-        map.addLayer({
-          id: circleLayerId,
-          type: "circle",
-          source: worldSourceId,
-          paint: {
-            "circle-radius": ["case", ["get", "selected"], 7, ["==", ["get", "availability"], "available"], 5.5, 4.2],
-            "circle-color": ["match", ["get", "availability"], "available", "#f3d889", "preview", "#d6b879", "#79d8b2"],
-            "circle-opacity": ["case", ["get", "selected"], 1, 0.86],
-            "circle-stroke-color": ["case", ["get", "selected"], "#fff1bd", "#e7e5e4"],
-            "circle-stroke-opacity": ["case", ["get", "selected"], 0.9, 0.42],
-            "circle-stroke-width": ["case", ["get", "selected"], 2.2, 1.1],
-            "circle-blur": 0.08,
-          },
-        });
-        map.addLayer({
-          id: labelLayerId,
-          type: "symbol",
-          source: worldSourceId,
-          filter: [
-            "all",
-            ["==", ["get", "selected"], false],
-            ["match", ["get", "id"], ["destination-abu-dhabi", "destination-cairo"], true, false],
-          ],
-          layout: {
-            "symbol-sort-key": ["get", "sortKey"],
-            "text-field": ["get", "title"],
-            "text-font": ["Noto Sans Regular"],
-            "text-size": ["interpolate", ["linear"], ["zoom"], 2, 9, 4.5, 11.5],
-            "text-variable-anchor": ["top", "right", "bottom", "left"],
-            "text-radial-offset": 1.05,
-            "text-justify": "auto",
-            "text-padding": 5,
-            "text-allow-overlap": false,
-            "text-optional": true,
-          },
-          paint: {
-            "text-color": ["match", ["get", "availability"], "available", "#fff1bd", "preview", "#e7d7aa", "#cdeee0"],
-            "text-opacity": ["match", ["get", "availability"], "available", 0.98, "preview", 0.82, 0.75],
-            "text-halo-color": "#07110e",
-            "text-halo-width": 1.6,
-          },
-        });
-        map.addLayer({
-          id: hoverLabelLayerId,
-          type: "symbol",
-          source: worldSourceId,
-          filter: ["==", ["get", "id"], ""],
-          layout: {
-            "text-field": ["get", "title"],
-            "text-font": ["Noto Sans Regular"],
-            "text-size": 11,
-            "text-variable-anchor": ["top", "right", "bottom", "left"],
-            "text-radial-offset": 1.1,
-            "text-justify": "auto",
-            "text-allow-overlap": true,
-            "text-ignore-placement": true,
-          },
-          paint: {
-            "text-color": "#fff1bd",
-            "text-halo-color": "#07110e",
-            "text-halo-width": 1.8,
-          },
-        });
-        map.addLayer({
-          id: selectedLabelLayerId,
-          type: "symbol",
-          source: worldSourceId,
-          filter: ["==", ["get", "selected"], true],
-          layout: {
-            "text-field": ["get", "title"],
-            "text-font": ["Noto Sans Regular"],
-            "text-size": 12,
-            "text-variable-anchor": ["top", "right", "bottom", "left"],
-            "text-radial-offset": 1.15,
-            "text-justify": "auto",
-            "text-allow-overlap": true,
-            "text-ignore-placement": true,
-          },
-          paint: {
-            "text-color": "#fff6d8",
-            "text-halo-color": "#07110e",
-            "text-halo-width": 2,
-          },
-        });
-      }
-    } catch {
-      onProviderError();
-      return;
+    for (const node of worldNodes) {
+      const statusKey = node.availability === "available"
+        ? "map.nodeAria.available"
+        : node.availability === "preview"
+          ? "map.nodeAria.preview"
+          : "map.nodeAria.comingSoon";
+      const marker = createMarkerButton(
+        node.name,
+        node.availability,
+        node.id === selectedDestinationId,
+        locale,
+        t(statusKey, { name: node.name[locale] }),
+        () => onDestinationSelect(node.id),
+      );
+      marker.button.classList.add("world-map-node");
+      marker.button.dataset.labelVisible = "false";
+      markers.push(new maplibregl.Marker({ element: marker.button, anchor: "center" })
+        .setLngLat(asLngLat(node.coordinates))
+        .addTo(map));
+      markerRecords.push({ button: marker.button, node });
+      disposers.push(marker.dispose);
     }
 
-    const markerAt = (event: maplibregl.MapMouseEvent) => resolveNearestMarkerId(
-      worldNodes.map((node) => {
+    const applyWorldLayout = () => {
+      const container = map.getContainer();
+      const projectedMarkers = markerRecords.map(({ node }) => {
         const point = map.project(asLngLat(node.coordinates));
-        return { id: node.id, x: point.x, y: point.y };
-      }),
-      { x: event.point.x, y: event.point.y },
-      24,
-    );
-    const handleSelect = (event: maplibregl.MapMouseEvent) => {
-      const id = markerAt(event);
-      if (id) onDestinationSelect(id);
+        return { node, point, marker: { id: node.id, x: point.x, y: point.y } };
+      });
+      const hitDiameters = resolveNonOverlappingHitDiameters(
+        projectedMarkers.map(({ marker }) => marker),
+      );
+      const placements = new Map(resolveMapLabelPlacements(
+        projectedMarkers.map(({ node, point }) => {
+          return {
+            id: node.id,
+            x: point.x,
+            y: point.y,
+            labelLength: node.name.en.length + node.name.ar.length * 0.55,
+            priority: getWorldNodePresentationPriority(node, selectedDestinationId),
+            selected: node.id === selectedDestinationId,
+          };
+        }),
+        {
+          width: container.clientWidth,
+          height: container.clientHeight,
+          maxLabels: container.clientWidth < 640 ? 0 : 3,
+          insets: {
+            top: container.clientWidth < 700 ? 112 : 90,
+            right: 20,
+            bottom: container.clientWidth < 1024 && selectedDestinationId
+              ? Math.min(230, container.clientHeight * 0.38)
+              : 34,
+            left: 20,
+          },
+        },
+      ).map((placement) => [placement.id, placement]));
+
+      for (const { button, node } of markerRecords) {
+        const placement = placements.get(node.id);
+        const hitSize = `${hitDiameters.get(node.id) ?? 32}px`;
+        const labelVisible = String(Boolean(
+          placement?.visible && shouldShowPersistentWorldLabel(
+            node.id,
+            selectedDestinationId,
+            container.clientWidth,
+          ),
+        ));
+        const labelAnchor = placement?.anchor ?? "top";
+        if (button.style.getPropertyValue("--marker-hit-size") !== hitSize) {
+          button.style.setProperty("--marker-hit-size", hitSize);
+        }
+        if (button.dataset.labelVisible !== labelVisible) {
+          button.dataset.labelVisible = labelVisible;
+        }
+        if (button.dataset.labelAnchor !== labelAnchor) {
+          button.dataset.labelAnchor = labelAnchor;
+        }
+      }
     };
-    let hoveredMarkerId = "";
-    const showPointer = (event: maplibregl.MapMouseEvent) => {
-      map.getCanvas().style.cursor = "pointer";
-      const nextId = markerAt(event) ?? "";
-      if (nextId === hoveredMarkerId) return;
-      hoveredMarkerId = nextId;
-      map.setFilter(hoverLabelLayerId, ["==", ["get", "id"], hoveredMarkerId]);
+
+    let layoutFrame: number | null = null;
+    const scheduleWorldLayout = () => {
+      if (layoutFrame !== null) return;
+      layoutFrame = requestAnimationFrame(() => {
+        layoutFrame = null;
+        applyWorldLayout();
+      });
     };
-    const clearPointer = () => {
-      map.getCanvas().style.cursor = "";
-      hoveredMarkerId = "";
-      map.setFilter(hoverLabelLayerId, ["==", ["get", "id"], ""]);
-    };
-    map.on("click", hitLayerId, handleSelect);
-    map.on("mousemove", hitLayerId, showPointer);
-    map.on("mouseleave", hitLayerId, clearPointer);
+
+    applyWorldLayout();
+    map.on("move", scheduleWorldLayout);
+    map.on("resize", scheduleWorldLayout);
 
     return () => {
-      map.off("click", hitLayerId, handleSelect);
-      map.off("mousemove", hitLayerId, showPointer);
-      map.off("mouseleave", hitLayerId, clearPointer);
+      map.off("move", scheduleWorldLayout);
+      map.off("resize", scheduleWorldLayout);
+      if (layoutFrame !== null) cancelAnimationFrame(layoutFrame);
+      for (const dispose of disposers) dispose();
+      for (const marker of markers) marker.remove();
     };
-  }, [level, locale, onDestinationSelect, onProviderError, selectedDestinationId, styleRevision, worldNodes]);
+  }, [level, locale, onDestinationSelect, selectedDestinationId, styleRevision, t, worldNodes]);
 
   useEffect(() => {
     const map = readyMapRef.current;
@@ -527,6 +650,7 @@ export function MapLibreMapSurface({
         locale,
         t(statusKey, { name: hotspot.name[locale] }),
         () => onHotspotSelect(hotspot.id),
+        hotspot.kind,
       );
       markers.push(new maplibregl.Marker({ element: marker.button, anchor: "center" })
         .setLngLat(asLngLat(hotspot.coordinates))
@@ -637,7 +761,7 @@ export function MapLibreMapSurface({
         zoom: route.to.zoom,
         pitch: route.to.pitch,
         bearing: route.to.bearing,
-        duration: Math.max(1_500, route.durationMs - 650),
+        duration: Math.max(900, route.durationMs - 450),
         curve: 1.35,
         speed: 0.92,
         easing: (time) => time < 0.5 ? 4 * time * time * time : 1 - Math.pow(-2 * time + 2, 3) / 2,
@@ -663,7 +787,7 @@ export function MapLibreMapSurface({
         zoom: Math.min(4.1, Math.max(2.8, map.getZoom() + 0.55)),
         pitch: 0,
         bearing: route.originDestinationId ? -5 : 0,
-        duration: 650,
+        duration: 450,
         easing: (time) => 1 - Math.pow(1 - time, 3),
         essential: false,
       });

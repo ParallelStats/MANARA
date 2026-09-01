@@ -24,6 +24,19 @@ function recognition(
 }
 
 describe("browser Arabic speech recognition", () => {
+  it("reuses the recognition instance created during capability detection", async () => {
+    const fake = recognition((instance) => instance.onresult?.({
+      results: Object.assign([{ 0: { transcript: "أبغي قهوة" }, isFinal: true }], { length: 1 }),
+    }));
+    const factory = vi.fn(() => fake);
+    const port = createBrowserSpeechRecognition(factory);
+
+    await expect(port.listen({ language: "ar-AE", timeoutMs: 50 })).resolves.toMatchObject({
+      ok: true,
+    });
+    expect(factory).toHaveBeenCalledOnce();
+  });
+
   it("reports unsupported browsers and preserves the typed fallback", async () => {
     const port = createBrowserSpeechRecognition(() => undefined);
     expect(port.available).toBe(false);
@@ -88,6 +101,21 @@ describe("browser Arabic speech recognition", () => {
     await expect(listening).resolves.toEqual({ ok: true, transcript: "أبغي قهوة" });
     expect(fake.stop).toHaveBeenCalledOnce();
     expect(fake.abort).not.toHaveBeenCalled();
+  });
+
+  it("does not remain stuck when a browser omits the end event after stop", async () => {
+    const fake = recognition(() => undefined);
+    fake.stop = vi.fn();
+    const port = createBrowserSpeechRecognition(() => fake);
+    const listening = port.listen({ language: "ar-AE", timeoutMs: 1_000 });
+
+    fake.onresult?.({
+      results: Object.assign([{ 0: { transcript: "أبغي قهوة" }, isFinal: false }], { length: 1 }),
+    });
+    port.stop();
+
+    await expect(listening).resolves.toEqual({ ok: true, transcript: "أبغي قهوة" });
+    expect(fake.stop).toHaveBeenCalledOnce();
   });
 
   it("releases the active microphone when the learner cancels or exits", async () => {

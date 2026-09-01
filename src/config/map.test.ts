@@ -34,9 +34,10 @@ describe("MapLibre configuration", () => {
     const renderer = readFileSync("src/features/travel/map/maplibre-map-surface.tsx", "utf8");
 
     expect(renderer).toContain('map.setProjection({ type: "mercator" })');
-    expect(renderer).toContain("applyManaraMapPalette(map)");
+    expect(renderer).toContain("applyManaraMapPalette(map, level)");
     expect(renderer).toContain('event.sourceId === "openmaptiles"');
-    expect(renderer).toContain("event.isSourceLoaded");
+    expect(renderer).toMatch(/map\.querySourceFeatures\(\s*"openmaptiles"/);
+    expect(renderer).toContain("hasRenderableMapBase");
     expect(renderer).toContain('sourceLayer === "boundary"');
     expect(renderer).toContain('sourceLayer === "place" && !isCountryLabel');
     expect(renderer).toContain("markProviderReady");

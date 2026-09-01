@@ -4,15 +4,18 @@ import type {
   ConversationProviderResult,
   ConversationTurnRequest,
 } from "@/ai/ports/conversation-provider";
+import { conversationEnhancementTimeoutMs } from "@/ai/providers/gemini/conversation-timeouts";
 import { parseGeneratedCharacterTurn } from "@/application/conversation/conversation-safety";
 
 type FetchLike = typeof fetch;
+
+export { conversationEnhancementTimeoutMs } from "@/ai/providers/gemini/conversation-timeouts";
 
 export async function requestConversationEnhancement(
   request: ConversationTurnRequest,
   signal: AbortSignal,
   fetcher: FetchLike = fetch,
-  timeoutMs = 1_500,
+  timeoutMs = conversationEnhancementTimeoutMs,
 ): Promise<ConversationProviderResult> {
   const controller = new AbortController();
   let timedOut = false;

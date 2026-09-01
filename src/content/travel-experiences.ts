@@ -17,7 +17,7 @@ export const destinationArrivals = [
   {
     destinationId: "destination-cairo",
     worldCamera: { center: [31.2357, 30.0444], zoom: 4.5, pitch: 8, bearing: 0 },
-    cityCamera: { center: [31.2357, 30.0444], zoom: 12.35, pitch: 48, bearing: -14 },
+    cityCamera: { center: [31.2357, 30.0444], zoom: 13.35, pitch: 48, bearing: -14 },
     atmosphere: "river",
     introduction: {
       en: "Explore café, transport, and market situations across the city.",
@@ -28,7 +28,7 @@ export const destinationArrivals = [
   {
     destinationId: "destination-abu-dhabi",
     worldCamera: { center: [54.3773, 24.4539], zoom: 4.5, pitch: 8, bearing: 0 },
-    cityCamera: { center: [54.3773, 24.4539], zoom: 12.55, pitch: 50, bearing: -22 },
+    cityCamera: { center: [54.3773, 24.4539], zoom: 13.4, pitch: 50, bearing: -22 },
     atmosphere: "coastal",
     introduction: {
       en: "Explore everyday communication situations across the city.",

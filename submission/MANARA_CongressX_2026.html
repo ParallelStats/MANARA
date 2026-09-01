@@ -25,7 +25,7 @@
       <div class="hero-copy">
         <p class="eyebrow">TRAVEL THE ARAB WORLD THROUGH ITS ARABIC.</p>
         <h1 id="page-one-title">YOUR ARABIC<br>DOESN'T RESTART<br>AT THE BORDER.<br><em>IT EVOLVES.</em></h1>
-        <p class="hero-deck">Arabic learners often discover that knowing Arabic is not the same as knowing what feels natural in a particular place. MANARA turns the Arab world into an immersive learning journey, helping each learner adapt the Arabic they already know - even if that is none - to real people, situations and everyday speech.</p>
+        <p class="hero-deck">Arabic learners often discover that knowing Arabic is not the same as knowing what feels natural in a particular place. MANARA turns the Arab world into an immersive learning journey, helping each learner adapt the Arabic they already know - or begin from zero - through real people, situations and everyday speech.</p>
       </div>
 
       <figure class="hero-visual" aria-label="Illustrative MANARA journey from the Arab-world network into an Abu Dhabi café">
@@ -99,7 +99,7 @@
 
       <div class="journey-flow" aria-label="Four-step MANARA experience">
         <article><span class="step-number">01</span><h3>ARRIVE</h3><p>Choose Abu Dhabi. Enter a café with a clear social goal.</p></article>
-        <article><span class="step-number">02</span><h3>SPEAK</h3><p>Hear Arabic, then answer by voice, text or a safe practice choice.</p></article>
+        <article><span class="step-number">02</span><h3>SPEAK</h3><p>Hear Arabic, then answer by voice, text or guided support.</p></article>
         <article><span class="step-number">03</span><h3>ADAPT</h3><p>If meaning is clear, the Local Guide may offer one more locally useful option.</p></article>
         <article><span class="step-number">04</span><h3>REUSE</h3><p>Try it immediately. The Local Character continues naturally.</p></article>
       </div>
@@ -134,12 +134,20 @@
       <div class="systems-grid">
         <article class="system-panel personal-panel">
           <div class="panel-kicker"><span>PERSONAL</span><strong>YOUR FUMBLE MAP</strong></div>
-          <div class="fumble-frame">
-            <img src="assets/direct-fumble-map.png" alt="Direct prototype screenshot of the Arabic Fumble Map">
-            <div class="fumble-overlay"><span>MANARA IS LEARNING</span><strong>HOW YOU LEARN.</strong></div>
+          <div class="fumble-map-visual" role="img" aria-label="Enhanced prototype Fumble Map showing strengths, local adaptation, a successful retry and a concept to revisit">
+            <div class="fumble-route">
+              <span>CAIRO</span><i aria-hidden="true"></i><b aria-hidden="true">→</b><i class="route-active" aria-hidden="true"></i><span>ABU DHABI</span>
+            </div>
+            <div class="fumble-title"><span>MANARA IS LEARNING</span><strong>HOW YOU LEARN.</strong><small>Not a grade. A record of movement.</small></div>
+            <div class="fumble-insights">
+              <article><i aria-hidden="true">✓</i><span>COMMUNICATING WELL</span><strong>Café ordering</strong></article>
+              <article><i aria-hidden="true">↗</i><span>ADAPTING LOCALLY</span><strong>Request forms in Abu Dhabi</strong></article>
+              <article><i aria-hidden="true">↺</i><span>SUCCESSFUL RETRY</span><strong>Used a local alternative successfully</strong></article>
+              <article><i aria-hidden="true">•</i><span>TO REVISIT</span><strong>Direction vocabulary</strong></article>
+            </div>
           </div>
-          <p>Your Fumble Map turns completed conversations into a small, useful picture of communication strengths, successful retries, local adaptation and concepts worth revisiting. It is not a grade. It is a record of movement.</p>
-          <small>Direct prototype screen</small>
+          <p>Completed conversations become useful signals: what communicates, what adapts, what worked on retry and what deserves another moment.</p>
+          <small>Enhanced prototype visualization</small>
         </article>
 
         <article class="system-panel scale-panel">
@@ -173,9 +181,15 @@
         <article><span>TECHNICALLY FEASIBLE</span><h3>TEACHING LOGIC<br>STAYS IN CONTROL.</h3><p>Optional conversational AI can make interactions more flexible; it does not decide what MANARA teaches.</p></article>
       </section>
 
-      <div class="impact-statement">
-        <p>MANARA moves Arabic beyond classroom abstraction. Place, culture and social context become part of the learning moment - without asking learners to discard the Arabic they already carry.</p>
-        <strong>LEARN ARABIC NOT AS ONE DESTINATION,<br>BUT AS A WORLD YOU CAN MOVE THROUGH.</strong>
+      <div class="closing-row">
+        <div class="impact-statement">
+          <p>MANARA moves Arabic beyond classroom abstraction. Place, culture and social context become part of the learning moment - without asking learners to discard the Arabic they already carry.</p>
+          <strong>LEARN ARABIC NOT AS ONE DESTINATION,<br>BUT AS A WORLD YOU CAN MOVE THROUGH.</strong>
+        </div>
+        <aside class="prototype-access" aria-label="Reserved area for the final interactive prototype QR code and short URL">
+          <div class="access-copy"><span>EXPLORE THE INTERACTIVE PROTOTYPE</span><strong>Scan to experience MANARA</strong><div class="short-url-slot"><em class="screen-placeholder">FINAL SHORT URL</em></div></div>
+          <div class="qr-slot" aria-hidden="true"><em class="screen-placeholder">FINAL QR</em></div>
+        </aside>
       </div>
       <footer class="page-footer"><span>MANARA | منارة</span><span>03 / 03</span></footer>
     </section>
@@ -223,7 +237,7 @@
         nodesLayer.appendChild(halo);
         const dot = document.createElementNS(svgNamespace,"circle");
         dot.setAttribute("cx",point.x); dot.setAttribute("cy",point.y);
-        dot.setAttribute("r",state === "active" ? 5.5 : state === "preview" ? 4 : 2.8);
+        dot.setAttribute("r",state === "active" ? 5.5 : state === "preview" ? 4 : 3.2);
         dot.setAttribute("class",`node-dot node-${state}`);
         nodesLayer.appendChild(dot);
         if (["Cairo","Abu Dhabi","Casablanca"].includes(name)) {

@@ -40,6 +40,7 @@ import { VoiceDock } from "@/features/learning/components/voice-dock";
 import { useUiPreferences } from "@/features/preferences/ui-preferences-provider";
 import {
   getDialogueBeat,
+  resolveDeterministicResponseOption,
   resolveDialogueAdvance,
   shouldShowGuideForTurn,
 } from "@/features/learning/lib/scenario-progression";
@@ -185,6 +186,31 @@ function generatedDialogueLine(
   };
 }
 
+function deterministicClarificationLine(
+  operationId: string,
+  scenarioId: string,
+  characterId: string,
+  promptArabic: string,
+  promptEnglish: string,
+): DialogueLine {
+  return {
+    id: `clarification-${operationId}`,
+    scenarioId,
+    characterId,
+    speaker: "local_character",
+    arabicText: `ممكن تعيدها بطريقة ثانية؟ ${promptArabic}`,
+    englishMeaning: `Could you try that another way? ${promptEnglish}`,
+    dialectOrRegister: "neutral conversational clarification draft",
+    communicativeIntent: "clarification",
+    linguisticNotes: "Deterministic scene redirection when the learner's intent is not recoverable.",
+    reviewerNote: "Review the neutral clarification wording before linguistic publication.",
+    validationStatus: "needs_review",
+    version: 1,
+    evidenceIds: [],
+    reviewerIds: [],
+  };
+}
+
 export function ImmersiveScenario({
   character,
   conversationEnhancementAvailable,
@@ -292,34 +318,62 @@ export function ImmersiveScenario({
 
     clearPendingTimer();
     const line = generatedLine ?? currentBeat.characterLine;
-    const language = destination.slug === "cairo" ? "ar-EG" : "ar-AE";
-    void speechPlayback.speak({ text: line.arabicText, language });
-    const speakingDuration = reduceMotion
-      ? 40
-      : Math.min(4_800, Math.max(1_250, line.arabicText.length * 82));
+    const minimumCaptionDuration = reduceMotion
+      ? 120
+      : Math.min(2_600, Math.max(900, line.arabicText.length * 42));
+    const playbackWatchdogDuration = Math.min(
+      18_000,
+      Math.max(7_000, line.arabicText.length * 260),
+    );
+    let active = true;
+    let playbackFinished = false;
+    let captionDurationElapsed = false;
+    let finished = false;
 
-    timerRef.current = setTimeout(() => {
-      speechPlayback.cancel();
-      timerRef.current = null;
+    const finishSpeaking = () => {
+      if (!active || finished || !playbackFinished || !captionDurationElapsed) return;
+      finished = true;
       if (generatedLine && pendingOption) {
         setGeneratedLine(null);
         advanceWithOption(pendingOption);
         return;
       }
-      setGeneratedLine(null);
       setPhase("ready");
       setVisualState("listening");
-    }, speakingDuration);
+    };
+
+    const captionTimer = window.setTimeout(() => {
+      captionDurationElapsed = true;
+      finishSpeaking();
+    }, minimumCaptionDuration);
+    const playbackWatchdog = window.setTimeout(() => {
+      speechPlayback.cancel();
+      playbackFinished = true;
+      finishSpeaking();
+    }, playbackWatchdogDuration);
+
+    void speechPlayback.speak({
+      text: line.arabicText,
+      language: character.voiceProfile.locale,
+      preferredGender: character.voiceProfile.preferredGender,
+    }).finally(() => {
+      playbackFinished = true;
+      window.clearTimeout(playbackWatchdog);
+      finishSpeaking();
+    });
 
     return () => {
-      clearPendingTimer();
+      active = false;
+      window.clearTimeout(captionTimer);
+      window.clearTimeout(playbackWatchdog);
       speechPlayback.cancel();
     };
   }, [
     advanceWithOption,
+    character.voiceProfile.locale,
+    character.voiceProfile.preferredGender,
     clearPendingTimer,
     currentBeat,
-    destination.slug,
     generatedLine,
     pendingOption,
     phase,
@@ -376,16 +430,20 @@ export function ImmersiveScenario({
     setPhase("processing");
     setVisualState("thinking");
     setPendingOption(option);
+    setGeneratedLine(null);
 
-    const presentCurrentPromptAgain = () => {
+    const presentDeterministicClarification = () => {
       setPendingOption(null);
-      setGeneratedLine({
-        ...currentBeat.characterLine,
-        id: `repeat-${operation.id}`,
-      });
+      setGeneratedLine(deterministicClarificationLine(
+        operation.id,
+        scenario.id,
+        character.id,
+        currentBeat.prompt.ar,
+        currentBeat.prompt.en,
+      ));
       operationGate.finish(operation.id);
       setPhase("character_speaking");
-      setVisualState("speaking");
+      setVisualState("clarification_reaction");
     };
 
     try {
@@ -393,7 +451,7 @@ export function ImmersiveScenario({
       if (!evaluation) throw new Error("Evaluation could not start.");
       let resolvedOption = option;
 
-      if (inputMode !== "scripted" && conversationEnhancementAvailable) {
+      if (inputMode !== "scripted" && conversationEnhancementAvailable && !resolvedOption) {
         const plannedAdvance = option
           ? resolveDialogueAdvance(pack, currentBeat, option)
           : null;
@@ -447,7 +505,7 @@ export function ImmersiveScenario({
       }
 
       if (inputMode !== "scripted" && !resolvedOption) {
-        presentCurrentPromptAgain();
+        presentDeterministicClarification();
         return;
       }
 
@@ -469,12 +527,12 @@ export function ImmersiveScenario({
         }
 
         advanceWithOption(resolvedOption);
-      }, reduceMotion ? 40 : 460);
+      }, reduceMotion ? 40 : 240);
     } catch {
       if (!operationGate.isCurrent(operation.id)) return;
       setActiveEvaluation(null);
       if (inputMode !== "scripted") {
-        presentCurrentPromptAgain();
+        presentDeterministicClarification();
       } else {
         operationGate.finish(operation.id);
         setPhase("ready");
@@ -502,11 +560,10 @@ export function ImmersiveScenario({
   }
 
   function submitInput(value: string, inputMode: "text" | "audio") {
-    const normalizedValue = normalizeLearnerInput(value);
-    const exactOption = currentBeat?.responseOptions.find(
-      ({ arabicText }) => normalizeLearnerInput(arabicText) === normalizedValue,
-    ) ?? null;
-    void submitResponse(value, inputMode, exactOption);
+    const resolvedOption = currentBeat
+      ? resolveDeterministicResponseOption(value, currentBeat.responseOptions)
+      : null;
+    void submitResponse(value, inputMode, resolvedOption);
   }
 
   function continueAfterGuide() {
@@ -706,7 +763,7 @@ export function ImmersiveScenario({
             animate={{ opacity: 1, y: 0 }}
           >
             <VoiceDock
-              key={currentBeat.id}
+              key={`${currentBeat.id}-${phase}`}
               beat={currentBeat}
               busy={phase !== "ready"}
               language={destination.slug === "cairo" ? "ar-EG" : "ar-AE"}

@@ -1,0 +1,7 @@
+Asset: abu-dhabi-cafe-mariam-master-v2.png
+Created: 2026-08-30
+Method: OpenAI built-in image generation, directed inside Codex
+Purpose: One master identity for the live Abu Dhabi cafe Local Character and the MANARA competition-submission compositions
+Derivatives: abu-dhabi-cafe-mariam-master-v2.webp; abu-dhabi-cafe-mariam-app-cutout-v3.webp; public/characters/abu-dhabi-cafe-mariam-refined-v3.webp; submission/assets/mariam.webp
+Rights context: Generated specifically for this MANARA project; confirm the competition organizer's submission terms before external publication.
+Cultural review: Pending final human review. The generation brief required a clearly hijabi, modestly dressed, contemporary Emirati cafe host with a natural, non-glamorous presentation.

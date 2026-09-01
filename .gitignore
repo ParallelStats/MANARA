@@ -4,6 +4,7 @@
 # Next.js output
 /.next/
 /out/
+/public/maplibre/
 
 # test and coverage output
 /coverage/
