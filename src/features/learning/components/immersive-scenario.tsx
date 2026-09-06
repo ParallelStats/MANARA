@@ -462,11 +462,19 @@ export function ImmersiveScenario({
     }
 
     let resolvedOption = option;
+const isCairoCafeDemoTurn =
+  scenario.id === "scenario-cairo-cafe" &&
+  (
+    currentBeat.id === "cac-01-order" ||
+    currentBeat.id === "cac-02-type"
+  ) &&
+  resolvedOption !== null;
 
-    if (
-      inputMode !== "scripted" &&
-      conversationEnhancementAvailable
-    ) {
+if (
+  inputMode !== "scripted" &&
+  conversationEnhancementAvailable &&
+  !isCairoCafeDemoTurn
+) {
       const plannedAdvance = resolvedOption
         ? resolveDialogueAdvance(
             pack,
@@ -508,7 +516,10 @@ export function ImmersiveScenario({
       );
 
       if (!operationGate.isCurrent(operation.id)) return;
-
+console.log("MANARA CONVERSATION RESULT", {
+  learnerInput,
+  result,
+});
       if (result.ok) {
         resolvedOption ??= selectSafeGeneratedAdvance(
           result.value,
@@ -612,12 +623,51 @@ export function ImmersiveScenario({
     void submitResponse(option.arabicText, "scripted", option);
   }
 
-  function submitInput(value: string, inputMode: "text" | "audio") {
-    const resolvedOption = currentBeat
-      ? resolveDeterministicResponseOption(value, currentBeat.responseOptions)
-      : null;
-    void submitResponse(value, inputMode, resolvedOption);
+function submitInput(value: string, inputMode: "text" | "audio") {
+  const normalized = value
+    .trim()
+    .replace(/[ًٌٍَُِّْـ]/g, "")
+    .replace(/[أإآ]/g, "ا")
+    .replace(/[؟?!.,،]/g, "")
+    .replace(/\s+/g, " ");
+
+  let resolvedOption = currentBeat
+    ? resolveDeterministicResponseOption(value, currentBeat.responseOptions)
+    : null;
+
+  // Guaranteed Cairo Café presentation path.
+  if (scenario.id === "scenario-cairo-cafe" && currentBeat) {
+    if (
+      currentBeat.id === "cac-01-order" &&
+      (
+        normalized.includes("عاوز قهوه") ||
+        normalized.includes("عايز قهوه") ||
+        normalized.includes("عاوز قهوة") ||
+        normalized.includes("عايز قهوة")
+      )
+    ) {
+      resolvedOption =
+        currentBeat.responseOptions.find(
+          (option) => option.id === "response-cac-01-target",
+        ) ?? resolvedOption;
+    }
+
+    if (
+      currentBeat.id === "cac-02-type" &&
+      (
+        normalized.includes("امريكانو") ||
+        normalized.includes("امريكانوا")
+      )
+    ) {
+      resolvedOption =
+        currentBeat.responseOptions.find(
+          (option) => option.id === "response-cac-02-americano",
+        ) ?? resolvedOption;
+    }
   }
+
+  void submitResponse(value, inputMode, resolvedOption);
+}
 
   function continueAfterGuide() {
     if (pendingOption) {

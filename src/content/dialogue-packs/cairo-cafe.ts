@@ -7,127 +7,224 @@ export const cairoCafeDialoguePack = {
   scenarioId: "scenario-cairo-cafe",
   characterId: "character-cairo-cafe-nour",
   environmentId: "environment-cairo-cafe",
-  title: { en: "Coffee with Nour", ar: "قهوة مع نور" },
+
+  title: {
+    en: "Coffee with Nour",
+    ar: "قهوة مع نور",
+  },
+
   startingBeatId: "cac-01-order",
   publicationStatus: "disabled",
+
   beats: [
     {
-      ...review, id: "cac-01-order", scenarioId: "scenario-cairo-cafe", sequence: 1,
+      ...review,
+      id: "cac-01-order",
+      scenarioId: "scenario-cairo-cafe",
+      sequence: 1,
+
       characterLine: {
-        ...review, id: "line-cac-01", scenarioId: "scenario-cairo-cafe", characterId: "character-cairo-cafe-nour", speaker: "local_character",
-        arabicText: "أهلاً، تحب تشرب إيه؟", englishMeaning: "Hi, what would you like to drink?", transliteration: "Ahlan, tihibb tishrab eh?",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "welcome_and_invite_drink_order",
-        linguisticNotes: "A short neighbourhood café opening.", reviewerNote: "Confirm contemporary Cairene naturalness, verb forms, and addressee-gender bounds.",
+        ...review,
+        id: "line-cac-01",
+        scenarioId: "scenario-cairo-cafe",
+        characterId: "character-cairo-cafe-nour",
+        speaker: "local_character",
+
+        arabicText: "أهلاً، تحب تشرب إيه؟",
+        englishMeaning: "Hi, what would you like to drink?",
+        transliteration: "Ahlan, tihibb tishrab eh?",
+
+        dialectOrRegister: "Casual Cairene Egyptian Arabic",
+        communicativeIntent: "welcome_and_invite_drink_order",
+        linguisticNotes: "Short natural café opening.",
+        reviewerNote: "Presentation demo dialogue.",
       },
-      prompt: { en: "Order a coffee.", ar: "اطلب قهوة." },
-      hint: { en: "Try: I want a coffee, please.", ar: "جرّب: عايز قهوة لو سمحت." },
-      vocabulary: [{ ...review, id: "vocab-cac-ayiz", arabic: "عايز", english: "I want", transliteration: "ayiz", reviewerNote: "Confirm gender/person bounds and casual café use." }],
+
+      prompt: {
+        en: "Order a coffee.",
+        ar: "اطلب قهوة.",
+      },
+
+      hint: {
+        en: "Say: I want coffee.",
+        ar: "قول: عاوز قهوة.",
+      },
+
+      vocabulary: [
+        {
+          ...review,
+          id: "vocab-cac-ayiz",
+          arabic: "عاوز",
+          english: "I want",
+          transliteration: "awiz",
+          reviewerNote: "Presentation demo vocabulary.",
+        },
+      ],
+
       responseOptions: [
         {
-          ...review, id: "response-cac-01-target", scenarioId: "scenario-cairo-cafe", beatId: "cac-01-order",
-          arabicText: "عايز قهوة لو سمحت", englishMeaning: "I want a coffee, please.", transliteration: "Ayiz ahwa law samaht.",
-          dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "order_coffee", kind: "target_dialect",
-          learningConceptId: "concept-order-coffee", variantId: "variant-egyptian-want-coffee", nextBeatId: "cac-02-sugar",
-          linguisticNotes: "Establishes the prototype Egyptian variant for later transfer.", reviewerNote: "Confirm wording, politeness, pronunciation guide, and learner-gender support.",
-        },
-        {
-          ...review, id: "response-cac-01-msa", scenarioId: "scenario-cairo-cafe", beatId: "cac-01-order",
-          arabicText: "أريد قهوة من فضلك", englishMeaning: "I would like coffee, please.", transliteration: "Uridu qahwatan min fadlik.",
-          dialectOrRegister: "Proposed Modern Standard Arabic / formal bridge", communicativeIntent: "order_coffee", kind: "msa",
-          learningConceptId: "concept-order-coffee", variantId: "variant-msa-want-coffee", nextBeatId: "cac-02-sugar",
-          linguisticNotes: "MSA-aware branch; it must be framed as valid register adaptation if reviewed.", reviewerNote: "Confirm formal effect in this exact Cairene café relationship.",
+          ...review,
+          id: "response-cac-01-target",
+          scenarioId: "scenario-cairo-cafe",
+          beatId: "cac-01-order",
+
+          arabicText: "عاوز قهوة",
+          englishMeaning: "I want coffee.",
+          transliteration: "Awiz ahwa.",
+
+          dialectOrRegister: "Casual Cairene Egyptian Arabic",
+          communicativeIntent: "order_coffee",
+          kind: "target_dialect",
+
+          learningConceptId: "concept-order-coffee",
+          variantId: "variant-egyptian-want-coffee",
+
+          nextBeatId: "cac-02-type",
+
+          linguisticNotes: "Deterministic presentation phrase.",
+          reviewerNote: "Presentation demo dialogue.",
         },
       ],
     },
+
     {
-      ...review, id: "cac-02-sugar", scenarioId: "scenario-cairo-cafe", sequence: 2,
+      ...review,
+      id: "cac-02-type",
+      scenarioId: "scenario-cairo-cafe",
+      sequence: 2,
+
       characterLine: {
-        ...review, id: "line-cac-02", scenarioId: "scenario-cairo-cafe", characterId: "character-cairo-cafe-nour", speaker: "local_character",
-        arabicText: "سادة ولا بسكر؟", englishMeaning: "Plain or with sugar?", transliteration: "Sada wala bi-sukkar?",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "ask_sugar_preference",
-        linguisticNotes: "A quick order-detail choice.", reviewerNote: "Confirm terminology and default coffee interpretation in this scene.",
+        ...review,
+        id: "line-cac-02",
+        scenarioId: "scenario-cairo-cafe",
+        characterId: "character-cairo-cafe-nour",
+        speaker: "local_character",
+
+        arabicText: "اي نوع قهوة عايز؟",
+        englishMeaning: "What kind of coffee do you want?",
+        transliteration: "Eh naw' ahwa ayiz?",
+
+        dialectOrRegister: "Casual Cairene Egyptian Arabic",
+        communicativeIntent: "ask_coffee_type",
+
+        linguisticNotes: "Asks which coffee the learner wants.",
+        reviewerNote: "Presentation demo dialogue.",
       },
-      prompt: { en: "Ask for a little sugar.", ar: "اطلب قليلاً من السكر." },
-      hint: { en: "Say: With a little sugar.", ar: "قل: بسكر خفيف." },
-      vocabulary: [{ ...review, id: "vocab-cac-sukkar", arabic: "بسكر خفيف", english: "with a little sugar", transliteration: "bi-sukkar khafif", reviewerNote: "Confirm naturalness and intended sugar level." }],
-      responseOptions: [{
-        ...review, id: "response-cac-02", scenarioId: "scenario-cairo-cafe", beatId: "cac-02-sugar",
-        arabicText: "بسكر خفيف", englishMeaning: "With a little sugar.", transliteration: "Bi-sukkar khafif.",
-        dialectOrRegister: "Proposed casual Cairene café speech", communicativeIntent: "choose_light_sugar", kind: "beginner_model",
-        learningConceptId: "concept-drink-detail", nextBeatId: "cac-03-size", linguisticNotes: "Concise service response.", reviewerNote: "Confirm conventional order terminology and agreement.",
-      }],
+
+      prompt: {
+        en: "Choose an Americano.",
+        ar: "اختار أمريكانو.",
+      },
+
+      hint: {
+        en: "Say: Americano.",
+        ar: "قول: أمريكانو.",
+      },
+
+      vocabulary: [
+        {
+          ...review,
+          id: "vocab-cac-americano",
+          arabic: "أمريكانو",
+          english: "Americano",
+          transliteration: "Americano",
+          reviewerNote: "Presentation demo vocabulary.",
+        },
+      ],
+
+      responseOptions: [
+        {
+          ...review,
+          id: "response-cac-02-americano",
+          scenarioId: "scenario-cairo-cafe",
+          beatId: "cac-02-type",
+
+          arabicText: "أمريكانو",
+          englishMeaning: "Americano.",
+          transliteration: "Americano.",
+
+          dialectOrRegister: "Casual café speech",
+          communicativeIntent: "choose_americano",
+          kind: "target_dialect",
+
+          learningConceptId: "concept-coffee-type",
+
+          nextBeatId: "cac-03-close",
+
+          linguisticNotes: "Deterministic presentation phrase.",
+          reviewerNote: "Presentation demo dialogue.",
+        },
+      ],
     },
+
     {
-      ...review, id: "cac-03-size", scenarioId: "scenario-cairo-cafe", sequence: 3,
+      ...review,
+      id: "cac-03-close",
+      scenarioId: "scenario-cairo-cafe",
+      sequence: 3,
+      isCompletionBeat: true,
+
       characterLine: {
-        ...review, id: "line-cac-03", scenarioId: "scenario-cairo-cafe", characterId: "character-cairo-cafe-nour", speaker: "local_character",
-        arabicText: "تحبها كبيرة ولا صغيرة؟", englishMeaning: "Would you like it large or small?", transliteration: "Tihibbaha kibira wala sughayyara?",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "ask_drink_size",
-        linguisticNotes: "Adds a familiar binary decision to the order.", reviewerNote: "Confirm pronominal reference, adjective forms, and café size conventions.",
+        ...review,
+        id: "line-cac-03",
+        scenarioId: "scenario-cairo-cafe",
+        characterId: "character-cairo-cafe-nour",
+        speaker: "local_character",
+
+        arabicText: "تفضل اقعد دقايق واجيبهولك",
+        englishMeaning: "Have a seat for a few minutes and I'll bring it to you.",
+        transliteration: "Tfaddal o'od da'aye' w ageebholak.",
+
+        dialectOrRegister: "Casual Cairene Egyptian Arabic",
+        communicativeIntent: "confirm_americano_order",
+
+        linguisticNotes: "Friendly café order confirmation.",
+        reviewerNote: "Presentation demo dialogue.",
       },
-      prompt: { en: "Choose a small one.", ar: "اختر الحجم الصغير." },
-      hint: { en: "Say: Small, please.", ar: "قل: صغيرة، من فضلك." },
-      vocabulary: [{ ...review, id: "vocab-cac-sughayyara", arabic: "صغيرة", english: "small", transliteration: "sughayyara", reviewerNote: "Confirm vowel/transliteration and referent agreement." }],
-      responseOptions: [{
-        ...review, id: "response-cac-03", scenarioId: "scenario-cairo-cafe", beatId: "cac-03-size",
-        arabicText: "صغيرة، من فضلك", englishMeaning: "Small, please.", transliteration: "Sughayyara, min fadlik.",
-        dialectOrRegister: "Proposed casual/neutral Cairene café speech", communicativeIntent: "choose_small_size", kind: "beginner_model",
-        learningConceptId: "concept-drink-detail", nextBeatId: "cac-04-here", linguisticNotes: "Modeled beginner response.", reviewerNote: "Confirm politeness and natural ellipsis.",
-      }],
-    },
-    {
-      ...review, id: "cac-04-here", scenarioId: "scenario-cairo-cafe", sequence: 4,
-      characterLine: {
-        ...review, id: "line-cac-04", scenarioId: "scenario-cairo-cafe", characterId: "character-cairo-cafe-nour", speaker: "local_character",
-        arabicText: "تشربها هنا ولا تاخدها معاك؟", englishMeaning: "Will you drink it here or take it with you?", transliteration: "Tishrabha hina wala takhodha ma'ak?",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "ask_dine_in_or_takeaway",
-        linguisticNotes: "Moves the order toward completion using a natural service choice.", reviewerNote: "Confirm verb pronunciation, object pronouns, and current café phrasing.",
+
+      prompt: {
+        en: "Finish the café interaction.",
+        ar: "اختتم الطلب.",
       },
-      prompt: { en: "Say you will have it here.", ar: "قل إنك ستشربها هنا." },
-      hint: { en: "Say: Here.", ar: "قل: هنا." },
-      vocabulary: [{ ...review, id: "vocab-cac-hina", arabic: "هنا", english: "here", transliteration: "hina", reviewerNote: "Confirm expected Cairene pronunciation guide." }],
-      responseOptions: [{
-        ...review, id: "response-cac-04", scenarioId: "scenario-cairo-cafe", beatId: "cac-04-here",
-        arabicText: "هنا", englishMeaning: "Here.", transliteration: "Hina.",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "choose_dine_in", kind: "beginner_model",
-        learningConceptId: "concept-drink-detail", nextBeatId: "cac-05-anything-else", linguisticNotes: "One-word answer is intentionally acceptable in context.", reviewerNote: "Confirm pragmatic completeness and pronunciation guide.",
-      }],
-    },
-    {
-      ...review, id: "cac-05-anything-else", scenarioId: "scenario-cairo-cafe", sequence: 5,
-      characterLine: {
-        ...review, id: "line-cac-05", scenarioId: "scenario-cairo-cafe", characterId: "character-cairo-cafe-nour", speaker: "local_character",
-        arabicText: "تحب حاجة تانية؟", englishMeaning: "Would you like anything else?", transliteration: "Tihibb haga tanya?",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "offer_additional_item",
-        linguisticNotes: "Creates a concise polite-decline turn.", reviewerNote: "Confirm contemporary Cairo wording and addressee bounds.",
+
+      hint: {
+        en: "Say: Thanks.",
+        ar: "قول: شكراً.",
       },
-      prompt: { en: "Decline and thank Nour.", ar: "ارفض واشكر نور." },
-      hint: { en: "Say: No, thank you.", ar: "قل: لا، شكراً." },
-      vocabulary: [{ ...review, id: "vocab-cac-shukran", arabic: "شكراً", english: "thank you", transliteration: "shukran", reviewerNote: "Confirm intended spoken delivery and register." }],
-      responseOptions: [{
-        ...review, id: "response-cac-05", scenarioId: "scenario-cairo-cafe", beatId: "cac-05-anything-else",
-        arabicText: "لا، شكراً", englishMeaning: "No, thank you.", transliteration: "La, shukran.",
-        dialectOrRegister: "Neutral everyday Arabic in a Cairene context", communicativeIntent: "decline_additional_item", kind: "beginner_model",
-        learningConceptId: "concept-polite-close", nextBeatId: "cac-06-close", linguisticNotes: "Polite decline.", reviewerNote: "Confirm spoken naturalness in this context.",
-      }],
-    },
-    {
-      ...review, id: "cac-06-close", scenarioId: "scenario-cairo-cafe", sequence: 6, isCompletionBeat: true,
-      characterLine: {
-        ...review, id: "line-cac-06", scenarioId: "scenario-cairo-cafe", characterId: "character-cairo-cafe-nour", speaker: "local_character",
-        arabicText: "تمام، القهوة جاية حالاً.", englishMeaning: "Great—the coffee is coming right away.", transliteration: "Tamam, il-ahwa gayya halan.",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "confirm_order",
-        linguisticNotes: "Signals successful completion without turning Nour into a teacher.", reviewerNote: "Confirm phrasing, agreement, and café naturalness.",
-      },
-      prompt: { en: "Close the exchange warmly.", ar: "اختتم الحوار بلطف." },
-      hint: { en: "Say: Thanks.", ar: "قل: تسلمي." },
-      vocabulary: [{ ...review, id: "vocab-cac-tislamy", arabic: "تسلمي", english: "thanks (to a woman)", transliteration: "tislamy", reviewerNote: "Confirm gendered address, spelling, and pragmatic gloss." }],
-      responseOptions: [{
-        ...review, id: "response-cac-06", scenarioId: "scenario-cairo-cafe", beatId: "cac-06-close",
-        arabicText: "تسلمي", englishMeaning: "Thanks.", transliteration: "Tislamy.",
-        dialectOrRegister: "Proposed casual Cairene Egyptian Arabic", communicativeIntent: "thank_and_close", kind: "beginner_model",
-        learningConceptId: "concept-polite-close", completesScenario: true, linguisticNotes: "Gendered closing addressed to Nour.", reviewerNote: "Confirm spelling, pronunciation, and relationship/register.",
-      }],
+
+      vocabulary: [
+        {
+          ...review,
+          id: "vocab-cac-shukran",
+          arabic: "شكراً",
+          english: "Thanks",
+          transliteration: "Shukran",
+          reviewerNote: "Presentation demo vocabulary.",
+        },
+      ],
+
+      responseOptions: [
+        {
+          ...review,
+          id: "response-cac-03-thanks",
+          scenarioId: "scenario-cairo-cafe",
+          beatId: "cac-03-close",
+
+          arabicText: "شكراً",
+          englishMeaning: "Thanks.",
+          transliteration: "Shukran.",
+
+          dialectOrRegister: "Everyday Arabic",
+          communicativeIntent: "thank_and_close",
+          kind: "beginner_model",
+
+          learningConceptId: "concept-polite-close",
+          completesScenario: true,
+
+          linguisticNotes: "Simple closing response.",
+          reviewerNote: "Presentation demo dialogue.",
+        },
+      ],
     },
   ],
 } as const satisfies DialoguePack;
